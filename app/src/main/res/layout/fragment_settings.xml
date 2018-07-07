@@ -52,11 +52,12 @@
                 android:layout_marginBottom="5dp"
                 android:text="Tokens" />
 
-            <com.google.android.material.button.MaterialButton
+            <Button
                 android:id="@+id/add_token"
                 android:layout_width="wrap_content"
+                android:textSize="8sp"
+                android:textColor="@color/colorAccent"
                 android:layout_height="wrap_content"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:text="+ Watch Token"/>
 
             <TextView
@@ -87,11 +88,12 @@
                 android:layout_height="wrap_content"
                 android:text="NGN"/>
 
-            <com.google.android.material.button.MaterialButton
+            <Button
                 android:id="@+id/add_more_currency"
                 android:layout_width="wrap_content"
+                android:textSize="8sp"
+                android:textColor="@color/colorAccent"
                 android:layout_height="wrap_content"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:text="+ Currency"/>
 
             <TextView

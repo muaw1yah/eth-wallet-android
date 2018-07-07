@@ -7,16 +7,16 @@ import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.google.android.material.button.MaterialButton;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class SettingsFragment extends Fragment {
-    private MaterialButton addCurrency;
+    private Button addCurrency;
 
     public static SettingsFragment newInstance() {
         SettingsFragment fragment = new SettingsFragment();

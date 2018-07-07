@@ -20,5 +20,6 @@
         <item>GBP</item>
         <item>CND</item>
     </string-array>
+    <string name="title_activity_scan_to_send">ScanToSendActivity</string>
 
 </resources>

@@ -3,15 +3,18 @@ package com.example.crimson.crimson;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.app.FragmentTransaction;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuItem;
 
 import android.app.Fragment;
+import android.view.View;
+import android.widget.Button;
 
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity  {
     private int current;
+    private Button scanToSendBtn;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {

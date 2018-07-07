@@ -3,6 +3,8 @@ package com.example.crimson.crimson;
 import android.app.Activity;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,8 +21,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -101,7 +101,8 @@ public class WalletFragment extends Fragment {
 
     public void createNewWallet() {
         if(wallet_list.size() > 4) {
-            Toast.makeText(getActivity().getApplicationContext(), "Cannot add more than 5 wallets", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getActivity().getApplicationContext(), "Cannot add more than 5 wallets", Toast.LENGTH_SHORT).show();
+            Snackbar.make(getView(), "Cannot add more than 5 wallets", Snackbar.LENGTH_LONG).show();
             return;
         }
         builder
@@ -123,8 +124,8 @@ public class WalletFragment extends Fragment {
                             String address = parentObject.getString("publicAddress");
                             String key = parentObject.getString("privateKey");
                             String name = "Wallet " + (wallet_list.size() + 1);
-                            CrimsonWallet wallet = new CrimsonWallet(name, address, key, 0);
-                            wallet = helper.saveToDB(wallet);
+                            CrimsonWallet wallet = helper.saveToDB(new CrimsonWallet(name, address, key, 0));
+                            Log.i("ID", "Wallet Id: " + wallet.getId());
                             if(mTextMessage.getVisibility() == View.VISIBLE) {
                                 mTextMessage.setVisibility(View.GONE);
                             }
@@ -150,4 +151,6 @@ public class WalletFragment extends Fragment {
         );
         queue.add(postRequest);
     }
+
+
 }

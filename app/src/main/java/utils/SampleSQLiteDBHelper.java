@@ -49,7 +49,7 @@ public class SampleSQLiteDBHelper extends SQLiteOpenHelper {
     }
 
     public ArrayList<CrimsonWallet> getAllWallets() {
-        ArrayList<CrimsonWallet> array_list = new ArrayList<CrimsonWallet>();
+        ArrayList<CrimsonWallet> array_list = new ArrayList<>();
 
         //hp = new HashMap();
         SQLiteDatabase db = this.getReadableDatabase();
@@ -61,7 +61,8 @@ public class SampleSQLiteDBHelper extends SQLiteOpenHelper {
             String address = res.getString(res.getColumnIndex(PERSON_COLUMN_ADDRESS));
             String key = res.getString(res.getColumnIndex(PERSON_COLUMN_KEY));
             Double balance = Double.parseDouble(res.getString(res.getColumnIndex(PERSON_COLUMN_BALANCE)));
-            CrimsonWallet wallet = new CrimsonWallet(name, address, key, balance);
+            int id = Integer.parseInt(res.getString(res.getColumnIndex(PERSON_COLUMN_ID)));
+            CrimsonWallet wallet = new CrimsonWallet(id, name, address, key, balance);
             array_list.add(wallet);
             res.moveToNext();
         }
@@ -98,11 +99,13 @@ public class SampleSQLiteDBHelper extends SQLiteOpenHelper {
     }
 
     public long updateWalletDB(CrimsonWallet wallet) {
+        if(wallet.getId() == -1) {
+            return -1;
+        }
         SQLiteDatabase database = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(SampleSQLiteDBHelper.PERSON_COLUMN_NAME, wallet.getName());
         values.put(SampleSQLiteDBHelper.PERSON_COLUMN_BALANCE, wallet.getBalance());
-        long id = database.update(SampleSQLiteDBHelper.WALLET_TABLE_NAME, values, "_id=" + wallet.getId(), null);
-        return id;
+        return (long) database.update(SampleSQLiteDBHelper.WALLET_TABLE_NAME, values, "_id=" + wallet.getId(), null);
     }
 }

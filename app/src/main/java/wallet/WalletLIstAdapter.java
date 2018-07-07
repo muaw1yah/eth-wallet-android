@@ -1,7 +1,8 @@
 package wallet;
 
-import android.content.ClipData;
 import android.content.Context;
+import android.support.design.widget.Snackbar;
+import android.support.design.widget.TextInputEditText;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,8 +13,6 @@ import android.widget.TextView;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.crimson.crimson.R;
-import com.google.android.material.snackbar.Snackbar;
-import com.google.android.material.textfield.TextInputEditText;
 import org.w3c.dom.Text;
 
 import java.util.List;
@@ -55,11 +54,9 @@ public class WalletLIstAdapter extends ArrayAdapter<CrimsonWallet> {
         }
 
         final CrimsonWallet wallet = getItem(position);
+        final TextView tt1 = v.findViewById(R.id.list_item_type1_text_view);
 
         if (wallet != null) {
-            TextView tt1 = v.findViewById(R.id.list_item_type1_text_view);
-
-
             if (tt1 != null) {
                 tt1.setText(wallet.getName());
             }
@@ -69,6 +66,7 @@ public class WalletLIstAdapter extends ArrayAdapter<CrimsonWallet> {
             @Override
             public void onClick(final View view) {
                 builder = new MaterialDialog.Builder(getContext());
+                Log.i("Hi", "form wallet id: " + wallet.getId());
                 builder
                         .title(wallet.getName())
                         .customView(R.layout.wallet_dialog, true)
@@ -82,6 +80,7 @@ public class WalletLIstAdapter extends ArrayAdapter<CrimsonWallet> {
                                 if(!newWalletName.equals(wallet.getName()) && newWalletName.length() > 3) {
                                     wallet.setName(newWalletName);
                                     long result = helper.updateWalletDB(wallet);
+                                    tt1.setText(wallet.getName());
                                     Snackbar.make(view, "updated with id " + result, Snackbar.LENGTH_LONG).show();
                                 }
                             }
