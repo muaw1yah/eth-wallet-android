@@ -13,10 +13,10 @@ import android.widget.TextView;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.crimson.crimson.R;
-import org.w3c.dom.Text;
 
 import java.util.List;
 
+import models.CrimsonWallet;
 import utils.SampleSQLiteDBHelper;
 
 /**

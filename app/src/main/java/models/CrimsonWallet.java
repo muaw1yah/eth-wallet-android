@@ -1,4 +1,4 @@
-package wallet;
+package models;
 
 import android.content.Context;
 import android.util.Log;

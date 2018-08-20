@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'io.objectbox'
 
 android {
     compileSdkVersion 'android-P'
@@ -26,16 +27,13 @@ dependencies {
     implementation 'com.android.support.constraint:constraint-layout:1.1.2'
     testImplementation 'junit:junit:4.12'
     implementation('org.web3j:core:3.3.1-android')
-    implementation 'com.android.volley:volley:1.1.0'
+    implementation 'com.android.volley:volley:1.1.1'
     implementation 'com.jaredrummler:material-spinner:1.2.5'
 
     // google mobile vision
     implementation 'com.google.android.gms:play-services-vision:15.0.2'
     // barcode reader
     implementation 'info.androidhive:barcode-reader:1.1.5'
-
-    implementation 'com.android.volley:volley:1.1.1'
-
     implementation 'de.petendi:ethereum-android-lib:0.2.1'
     testImplementation 'org.ethereum:ethereumj-core:1.2.0-RELEASE'
     testImplementation 'commons-io:commons-io:2.4'

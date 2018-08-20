@@ -6,17 +6,12 @@ import android.support.annotation.NonNull;
 import android.app.FragmentTransaction;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.MenuItem;
 
 import android.app.Fragment;
-import android.view.View;
 import android.widget.Button;
 
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.Volley;
-
-import wallet.CrimsonWallet;
+import models.CrimsonWallet;
 
 public class MainActivity extends AppCompatActivity  {
     private int current;
