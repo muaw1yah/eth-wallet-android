@@ -1,5 +1,6 @@
 package com.example.crimson.crimson;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.app.FragmentTransaction;
@@ -11,6 +12,11 @@ import android.view.MenuItem;
 import android.app.Fragment;
 import android.view.View;
 import android.widget.Button;
+
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.Volley;
+
+import wallet.CrimsonWallet;
 
 public class MainActivity extends AppCompatActivity  {
     private int current;
@@ -49,10 +55,24 @@ public class MainActivity extends AppCompatActivity  {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        new CheckBalance().execute();
 
         BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         navigation.setSelectedItemId(R.id.navigation_wallet);
         current = R.id.navigation;
+    }
+
+    private class CheckBalance extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            try {
+                CrimsonWallet.connectEthereum();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
     }
 }

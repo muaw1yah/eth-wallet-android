@@ -19,6 +19,7 @@ android {
     }
 }
 
+
 dependencies {
     implementation 'com.afollestad.material-dialogs:commons:0.9.6.0'
     implementation fileTree(dir: 'libs', include: ['*.jar'])
@@ -29,8 +30,21 @@ dependencies {
     implementation 'com.jaredrummler:material-spinner:1.2.5'
 
     // google mobile vision
-    implementation 'com.google.android.gms:play-services-vision:11.0.2'
-
+    implementation 'com.google.android.gms:play-services-vision:15.0.2'
     // barcode reader
     implementation 'info.androidhive:barcode-reader:1.1.5'
+
+    implementation 'com.android.volley:volley:1.1.1'
+
+    implementation 'de.petendi:ethereum-android-lib:0.2.1'
+    testImplementation 'org.ethereum:ethereumj-core:1.2.0-RELEASE'
+    testImplementation 'commons-io:commons-io:2.4'
+}
+
+configurations.all {
+    resolutionStrategy {
+        force 'com.fasterxml.jackson.core:jackson-databind:2.7.1-1'
+        force 'com.fasterxml.jackson.core:jackson-annotations:2.7.0'
+        force 'com.fasterxml.jackson.core:jackson-core:2.7.1'
+    }
 }
