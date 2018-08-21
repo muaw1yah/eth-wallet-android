@@ -2,7 +2,6 @@ package models;
 
 import io.objectbox.annotation.Entity;
 import io.objectbox.annotation.Id;
-import io.objectbox.annotation.Index;
 import io.objectbox.annotation.Unique;
 
 @Entity
@@ -14,6 +13,8 @@ public class Wallet {
     private String address;
 
     private String key;
+
+    private String name;
 
 
     public long getId() {
@@ -40,8 +41,15 @@ public class Wallet {
         this.key = key;
     }
 
-    public Wallet(long id, String address, String key) {
-        this.id = id;
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Wallet(String address, String key) {
         this.address = address;
         this.key = key;
     }

@@ -11,12 +11,25 @@ import android.view.MenuItem;
 import android.app.Fragment;
 import android.widget.Button;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.Volley;
+import com.kenai.jffi.Main;
+
+import io.objectbox.Box;
+import io.objectbox.BoxStore;
 import models.CrimsonWallet;
+import models.MyObjectBox;
+import models.Token;
+import models.Wallet;
 
 public class MainActivity extends AppCompatActivity  {
     private int current;
     private Button scanToSendBtn;
     public static final String SCANNED_ADDRESS = "scanned-address";
+    public static BoxStore boxStore;
+    public static Box<Wallet> walletBox;
+    public static Box<Token> tokenBox;
+    public static RequestQueue queue;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -56,6 +69,13 @@ public class MainActivity extends AppCompatActivity  {
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         navigation.setSelectedItemId(R.id.navigation_wallet);
         current = R.id.navigation;
+
+        boxStore = MyObjectBox.builder()
+                .androidContext(MainActivity.this).build();
+
+        queue = Volley.newRequestQueue(MainActivity.this);
+        walletBox = MainActivity.boxStore.boxFor(Wallet.class);
+        tokenBox = MainActivity.boxStore.boxFor(Token.class);
     }
 
     private class CheckBalance extends AsyncTask<Void, Void, Void> {

@@ -19,14 +19,11 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-
-import utils.SampleSQLiteDBHelper;
-import models.CrimsonWallet;
+import models.Wallet;
 import wallet.WalletLIstAdapter;
 
 
@@ -34,18 +31,14 @@ import wallet.WalletLIstAdapter;
  */
 public class WalletFragment extends Fragment {
     private TextView mTextMessage;
-    private RequestQueue queue;
     private MaterialDialog.Builder builder;
     private MaterialDialog dialog;
-    private SampleSQLiteDBHelper helper;
     private ArrayList wallet_list;
     private WalletLIstAdapter walletAdapter;
     private FloatingActionButton addWalletBtn;
 
-
     public static WalletFragment newInstance() {
-        WalletFragment fragment = new WalletFragment();
-        return fragment;
+        return new WalletFragment();
     }
 
     @Override
@@ -68,10 +61,8 @@ public class WalletFragment extends Fragment {
         mTextMessage = myFragmentView.findViewById(R.id.no_wallet_message);
         addWalletBtn = myFragmentView.findViewById(R.id.fab);
 
-        helper = new SampleSQLiteDBHelper(getActivity().getApplicationContext());
-        queue = Volley.newRequestQueue(getActivity().getApplicationContext());
-
-        wallet_list = helper.getAllWallets();
+        wallet_list = new ArrayList<>(MainActivity.walletBox.getAll());
+        //wallet_list = helper.getAllWallets();
         walletAdapter = new WalletLIstAdapter(getActivity(), R.layout.single_wallet, wallet_list);
 
         if(wallet_list.size() > 0) {
@@ -81,7 +72,6 @@ public class WalletFragment extends Fragment {
         if(wallet_list.size() > 4) {
             addWalletBtn.setVisibility(View.GONE);
         }
-        //helper.onUpgrade(helper.getWritableDatabase(), 1, 1);
 
         ListView walletListAdapter = myFragmentView.findViewById(R.id.wallet_list);
 
@@ -99,7 +89,6 @@ public class WalletFragment extends Fragment {
 
     public void createNewWallet() {
         if(wallet_list.size() > 4) {
-            //Toast.makeText(getActivity().getApplicationContext(), "Cannot add more than 5 wallets", Toast.LENGTH_SHORT).show();
             Snackbar.make(getView(), "Cannot add more than 5 wallets", Snackbar.LENGTH_LONG).show();
             return;
         }
@@ -122,7 +111,12 @@ public class WalletFragment extends Fragment {
                             String address = parentObject.getString("publicAddress");
                             String key = parentObject.getString("privateKey");
                             String name = "Wallet " + (wallet_list.size() + 1);
-                            CrimsonWallet wallet = helper.saveToDB(new CrimsonWallet(name, address, key, 0));
+                            Wallet wallet = new Wallet();
+                            wallet.setName(name);
+                            wallet.setAddress(address);
+                            wallet.setKey(key);
+                            wallet = MainActivity.walletBox.get(MainActivity.walletBox.put(wallet));
+
                             Log.i("ID", "Wallet Id: " + wallet.getId());
                             if(mTextMessage.getVisibility() == View.VISIBLE) {
                                 mTextMessage.setVisibility(View.GONE);
@@ -147,7 +141,7 @@ public class WalletFragment extends Fragment {
                     }
                 }
         );
-        queue.add(postRequest);
+        MainActivity.queue.add(postRequest);
     }
 
 
