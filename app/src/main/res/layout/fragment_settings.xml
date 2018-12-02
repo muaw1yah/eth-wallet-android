@@ -5,12 +5,13 @@
     tools:context="com.example.crimson.crimson.SettingsFragment">
 
     <RelativeLayout
-        android:padding="15dp"
+        android:padding="10dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <LinearLayout
             android:id="@+id/network"
+            android:padding="5dp"
             android:layout_alignParentTop="true"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -23,27 +24,38 @@
                 android:layout_marginBottom="5dp"/>
 
             <RadioGroup
+                android:id="@+id/select_channel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <RadioButton
-                    android:id="@+id/mainnet"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/mainnet_option"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:checked="true"
                     android:text="Mainnet" />
 
                 <RadioButton
-                    android:id="@+id/rinskby"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/rinkeby_option"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Rinskby" />
+                    android:text="Rinkby" />
 
                 <RadioButton
-                    android:id="@+id/ropsten"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/ropsten_option"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="2dp"
                     android:text="Ropsten" />
             </RadioGroup>
+
+
+
+            <!--tokens-->
+        <LinearLayout
+            android:id="@+id/tokens"
+            android:layout_alignParentTop="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
             <TextView
                 android:layout_width="match_parent"
@@ -52,6 +64,84 @@
                 android:layout_marginBottom="5dp"
                 android:text="Tokens" />
 
+            <RelativeLayout
+                android:id="@+id/token1"
+                android:padding="5dp"
+                android:visibility="gone"
+                android:background="#f223"
+                android:layout_width="match_parent"
+                android:layout_height="30dp">
+
+                <TextView
+                    android:id="@+id/token1_name"
+                    android:textColor="#fff"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Token 1" />
+
+                <TextView
+                    android:id="@+id/token1_balance"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:text="12.5 TRX"
+                    android:textColor="#fff" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/token2"
+                android:padding="5dp"
+                android:visibility="gone"
+                android:layout_marginTop="2dp"
+                android:background="#f223"
+                android:layout_width="match_parent"
+                android:layout_height="30dp">
+
+                <TextView
+                    android:id="@+id/token2_name"
+                    android:textColor="#fff"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Token 2" />
+
+                <TextView
+                    android:id="@+id/token2_balance"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:text="3434343.5 SVD"
+                    android:textColor="#fff" />
+
+            </RelativeLayout>
+
+
+            <RelativeLayout
+                android:id="@+id/token3"
+                android:padding="5dp"
+                android:visibility="gone"
+                android:layout_marginTop="2dp"
+                android:background="#f223"
+                android:layout_width="match_parent"
+                android:layout_height="30dp">
+
+                <TextView
+                    android:id="@+id/token3_name"
+                    android:textColor="#fff"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Token 3" />
+
+                <TextView
+                    android:id="@+id/token3_balance"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:text="0.23233 BTC"
+                    android:textColor="#fff" />
+
+            </RelativeLayout>
+
             <Button
                 android:id="@+id/add_token"
                 android:layout_width="wrap_content"
@@ -59,6 +149,8 @@
                 android:textColor="@color/colorAccent"
                 android:layout_height="wrap_content"
                 android:text="+ Watch Token"/>
+        </LinearLayout>
+
 
             <TextView
                 android:layout_width="match_parent"

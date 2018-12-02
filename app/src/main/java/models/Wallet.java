@@ -1,8 +1,25 @@
 package models;
 
+import org.json.JSONObject;
+import org.web3j.crypto.CipherException;
+import org.web3j.crypto.ECKeyPair;
+import org.web3j.crypto.Keys;
+import org.web3j.crypto.WalletFile;
+import org.web3j.protocol.Web3j;
+import org.web3j.protocol.Web3jFactory;
+import org.web3j.protocol.http.HttpService;
+
+import java.math.BigInteger;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.SecureRandom;
+
 import io.objectbox.annotation.Entity;
 import io.objectbox.annotation.Id;
 import io.objectbox.annotation.Unique;
+
+import static org.web3j.crypto.Wallet.createLight;
 
 @Entity
 public class Wallet {
@@ -52,6 +69,25 @@ public class Wallet {
     public Wallet(String address, String key) {
         this.address = address;
         this.key = key;
+    }
+
+    public static Wallet WalletFactory() throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException, CipherException {
+
+        SecureRandom rnd = new SecureRandom();
+        byte[] token = new byte[256];
+        rnd.nextBytes(token);
+        String seed = token.toString();
+
+            ECKeyPair ecKeyPair = Keys.createEcKeyPair();
+            BigInteger privateKeyInDec = ecKeyPair.getPrivateKey();
+
+            String sPrivatekeyInHex = privateKeyInDec.toString(16);
+
+            WalletFile aWallet = org.web3j.crypto.Wallet.createLight("namadi", ecKeyPair);
+            String sAddress = aWallet.getAddress();
+
+
+            return new Wallet("0x"+sAddress, sPrivatekeyInHex);
     }
 
     public Wallet() {}

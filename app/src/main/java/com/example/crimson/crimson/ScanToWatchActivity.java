@@ -9,13 +9,13 @@ import android.util.SparseArray;
 import android.widget.Toast;
 
 import com.google.android.gms.vision.barcode.Barcode;
+
 import java.util.List;
 
 import info.androidhive.barcode.BarcodeReader;
+import static utils.Constants.SCANNED_TO_WATCH_ADDRESS;
 
-import static utils.Constants.SCANNED_TO_SEND_ADDRESS;
-
-public class ScanToSendActivity extends AppCompatActivity implements BarcodeReader.BarcodeReaderListener {
+public class ScanToWatchActivity extends AppCompatActivity implements BarcodeReader.BarcodeReaderListener {
     private BarcodeReader barcodeReader;
     SharedPreferences sharedPref;
     SharedPreferences.Editor editor;
@@ -28,7 +28,7 @@ public class ScanToSendActivity extends AppCompatActivity implements BarcodeRead
         setContentView(R.layout.activity_scan_to_send);
         sharedPref = getPreferences(Context.MODE_PRIVATE);
         editor = sharedPref.edit();
-        editor.putString(SCANNED_TO_SEND_ADDRESS, null);
+        editor.putString(SCANNED_TO_WATCH_ADDRESS, null);
         editor.commit();
 
         barcodeReader = (BarcodeReader) getSupportFragmentManager().findFragmentById(R.id.barcode_fragment);
@@ -40,12 +40,10 @@ public class ScanToSendActivity extends AppCompatActivity implements BarcodeRead
     public void onScanned(Barcode barcode) {
         // play beep sound
         //Toast.makeText(getApplicationContext(), barcode.displayValue, Toast.LENGTH_LONG).show();
-        Log.i("SCAN", "onScanned: " + barcode.displayValue);
+        Log.e("SCAN", "onScanned: " + barcode.displayValue);
 
         if(barcode.displayValue.length() > 5) {
-            ScanToSendActivity.scannedValue = barcode.displayValue;
-            editor.putString(SCANNED_TO_SEND_ADDRESS, barcode.displayValue);
-            editor.commit();
+            ScanToWatchActivity.scannedValue = barcode.displayValue;
             finish();
         }
 

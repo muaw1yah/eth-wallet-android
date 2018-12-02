@@ -14,17 +14,19 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.web3j.crypto.CipherException;
 
+import java.security.InvalidAlgorithmParameterException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.util.ArrayList;
 import models.Wallet;
 import wallet.WalletLIstAdapter;
+
+import static utils.Constants.GENERATE_WALLET;
 
 
 /**
@@ -77,12 +79,7 @@ public class WalletFragment extends Fragment {
 
         walletListAdapter.setAdapter(walletAdapter);
 
-        addWalletBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                createNewWallet();
-            }
-        });
+        addWalletBtn.setOnClickListener(view -> createNewWallet());
 
         return myFragmentView;
     }
@@ -99,49 +96,58 @@ public class WalletFragment extends Fragment {
         dialog = builder.build();
         dialog.show();
 
-        String url = "https://pure-chamber-22089.herokuapp.com/wallet/";
-        StringRequest postRequest = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>()
-                {
-                    @Override
-                    public void onResponse(String response) {
-                        // response
-                        try {
-                            JSONObject parentObject = new JSONObject(response);
-                            String address = parentObject.getString("publicAddress");
-                            String key = parentObject.getString("privateKey");
-                            String name = "Wallet " + (wallet_list.size() + 1);
-                            Wallet wallet = new Wallet();
-                            wallet.setName(name);
-                            wallet.setAddress(address);
-                            wallet.setKey(key);
-                            wallet = MainActivity.walletBox.get(MainActivity.walletBox.put(wallet));
+        try {
+            Wallet wallet = Wallet.WalletFactory();
+            String name = "Wallet " + (wallet_list.size() + 1);
+            wallet.setName(name);
+            wallet = MainActivity.walletBox.get(MainActivity.walletBox.put(wallet));
 
-                            Log.i("ID", "Wallet Id: " + wallet.getId());
-                            if(mTextMessage.getVisibility() == View.VISIBLE) {
-                                mTextMessage.setVisibility(View.GONE);
-                            }
-                            wallet_list.add(wallet);
-                            walletAdapter.notifyDataSetChanged();
-                            Snackbar.make(getView(), "New wallet has been added ", Snackbar.LENGTH_LONG).show();
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                            Snackbar.make(getView(), "Cannot add wallet", Snackbar.LENGTH_LONG).show();
+            Log.i("ID", "Wallet Id: " + wallet.getId());
+            if(mTextMessage.getVisibility() == View.VISIBLE) {
+                mTextMessage.setVisibility(View.GONE);
+            }
+            wallet_list.add(wallet);
+            walletAdapter.notifyDataSetChanged();
+            Snackbar.make(getView(), "New wallet has been added ", Snackbar.LENGTH_LONG).show();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.i("CREATE WALLET", e.getMessage());
+        } finally {
+            dialog.dismiss();
+        }
+
+        StringRequest postRequest = new StringRequest(Request.Method.POST, GENERATE_WALLET,
+                response -> {
+                    try {
+                        JSONObject parentObject = new JSONObject(response);
+                        String address = parentObject.getString("publicAddress");
+                        String key = parentObject.getString("privateKey");
+                        String name = "Wallet " + (wallet_list.size() + 1);
+                        Wallet wallet = new Wallet();
+                        wallet.setName(name);
+                        wallet.setAddress(address);
+                        wallet.setKey(key);
+                        wallet = MainActivity.walletBox.get(MainActivity.walletBox.put(wallet));
+
+                        Log.i("ID", "Wallet Id: " + wallet.getId());
+                        if(mTextMessage.getVisibility() == View.VISIBLE) {
+                            mTextMessage.setVisibility(View.GONE);
                         }
-                        dialog.dismiss();
-                    }
-                },
-                new Response.ErrorListener()
-                {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        // error
+                        wallet_list.add(wallet);
+                        walletAdapter.notifyDataSetChanged();
+                        Snackbar.make(getView(), "New wallet has been added ", Snackbar.LENGTH_LONG).show();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                         Snackbar.make(getView(), "Cannot add wallet", Snackbar.LENGTH_LONG).show();
-                        dialog.dismiss();
                     }
+                    dialog.dismiss();
+                },
+                error -> {
+                    Snackbar.make(getView(), "Cannot add wallet", Snackbar.LENGTH_LONG).show();
+                    dialog.dismiss();
                 }
         );
-        MainActivity.queue.add(postRequest);
+        //MainActivity.queue.add(postRequest);
     }
 
 

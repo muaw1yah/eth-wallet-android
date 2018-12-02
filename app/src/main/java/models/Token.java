@@ -15,6 +15,7 @@ public class Token {
     private String name;
     private String symbol;
     private Integer decimal;
+    private String channel;
 
     public String getName() {
         return name;
@@ -54,6 +55,14 @@ public class Token {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getChannel() {
+        return channel;
+    }
+
+    public void setChannel(String channel) {
+        this.channel = channel;
     }
 
     public Token() {}
