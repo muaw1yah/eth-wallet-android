@@ -5,45 +5,55 @@
     android:layout_height="match_parent">
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/wallet_name_view"
-            android:text="Wallet Name"
-            android:textSize="20sp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:text="Wallet Name"
+            android:textSize="20sp" />
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <android.support.design.widget.TextInputEditText
-                android:visibility="gone"
                 android:id="@+id/wallet_name_input"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Change Wallet Name"/>
+                android:hint="Change Wallet Name"
+                android:visibility="gone" />
 
         </android.support.design.widget.TextInputLayout>
 
         <TextView
             android:id="@+id/wallet_address_view"
-            android:text="Wallet Name"
-            android:textSize="18sp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:text="Wallet Name"
+            android:textSize="18sp" />
 
         <TextView
             android:id="@+id/wallet_balance_view"
-            android:text="Wallet Name"
-            android:textSize="20sp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:text="Wallet Name"
+            android:textSize="20sp" />
 
-        
+        <Button
+            android:id="@+id/request_eth"
+            android:layout_width="253dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:layout_gravity="center"
+            android:text="Request Free Ether (Ropsten)" />
+
 
     </LinearLayout>
 </RelativeLayout>

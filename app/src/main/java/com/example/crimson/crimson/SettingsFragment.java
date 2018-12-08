@@ -85,7 +85,7 @@ public class SettingsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if(ScanToSendActivity.scannedValue != null) {
+        if(ScanToWatchActivity.scannedValue != null) {
             if(tokenAddressInput != null) {
                 tokenAddressInput.setText(ScanToWatchActivity.scannedValue);
                 ScanToWatchActivity.scannedValue = null;

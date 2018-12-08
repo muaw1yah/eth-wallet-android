@@ -13,6 +13,8 @@ import com.google.android.gms.vision.barcode.Barcode;
 import java.util.List;
 
 import info.androidhive.barcode.BarcodeReader;
+
+import static utils.Constants.SCANNED_TO_SEND_ADDRESS;
 import static utils.Constants.SCANNED_TO_WATCH_ADDRESS;
 
 public class ScanToWatchActivity extends AppCompatActivity implements BarcodeReader.BarcodeReaderListener {
@@ -29,7 +31,7 @@ public class ScanToWatchActivity extends AppCompatActivity implements BarcodeRea
         sharedPref = getPreferences(Context.MODE_PRIVATE);
         editor = sharedPref.edit();
         editor.putString(SCANNED_TO_WATCH_ADDRESS, null);
-        editor.commit();
+        editor.apply();
 
         barcodeReader = (BarcodeReader) getSupportFragmentManager().findFragmentById(R.id.barcode_fragment);
     }

@@ -44,8 +44,6 @@ public class ScanToSendActivity extends AppCompatActivity implements BarcodeRead
 
         if(barcode.displayValue.length() > 5) {
             ScanToSendActivity.scannedValue = barcode.displayValue;
-            editor.putString(SCANNED_TO_SEND_ADDRESS, barcode.displayValue);
-            editor.commit();
             finish();
         }
 

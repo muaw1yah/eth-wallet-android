@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.DialogAction;
@@ -36,6 +37,7 @@ import io.objectbox.query.Query;
 import io.objectbox.query.QueryBuilder;
 import models.Balance;
 import models.Balance_;
+import models.Token;
 import models.Wallet;
 
 import static utils.Constants.CURRENT_CHANNEL;
@@ -46,19 +48,24 @@ import static utils.Constants.RINKEBY_URL;
 import static utils.Constants.ROPSTEN_CHANNEL;
 import static utils.Constants.ROPSTEN_URL;
 import static utils.Constants.WEI2ETH;
+import static utils.Constants.ROPSTEN_REQUEST_ETH;
 
 /**
  * Created by crimson on 01/06/2018.
  */
 
 public class WalletLIstAdapter extends ArrayAdapter<Wallet> {
-    private MaterialDialog.Builder builder;
+    private MaterialDialog.Builder builder, reqBuilder;
+    private MaterialDialog dialog, reqDialog;
+
     private TextView walletNameView;
     private TextView walletAddressView;
     private TextView walletBalanceView;
+    private Button walletReqEthBtn;
     private TextInputEditText walletNameInput;
     private HashMap<String, Balance> balanceMap;
     private String currentChannel;
+
 
     public WalletLIstAdapter(Context context, int textViewResourceId) {
         super(context, textViewResourceId);
@@ -134,17 +141,20 @@ public class WalletLIstAdapter extends ArrayAdapter<Wallet> {
             walletBalanceView = dialogView.findViewById(R.id.wallet_balance_view);
             walletNameView = dialogView.findViewById(R.id.wallet_name_view);
             walletNameInput = dialogView.findViewById(R.id.wallet_name_input);
+            walletReqEthBtn = dialogView.findViewById(R.id.request_eth);
 
             walletAddressView.setText("Address : " + wallet.getAddress());
             walletNameView.setText(wallet.getName());
             walletNameInput.setText(wallet.getName());
+            walletBalanceView.setText(String.valueOf(balanceObj.getBalance()));
 
-            walletNameView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    walletNameView.setVisibility(View.GONE);
-                    walletNameInput.setVisibility(View.VISIBLE);
-                }
+            walletNameView.setOnClickListener(view1 -> {
+                walletNameView.setVisibility(View.GONE);
+                walletNameInput.setVisibility(View.VISIBLE);
+            });
+
+            walletReqEthBtn.setOnClickListener(view1 -> {
+                requestFreeEth(wallet, view);
             });
 
             builder.show();
@@ -234,6 +244,42 @@ public class WalletLIstAdapter extends ArrayAdapter<Wallet> {
         MainActivity.queue.add(request);
 
         return v;
+    }
+
+    private void requestFreeEth(Wallet wallet, View view) {
+        reqBuilder = new MaterialDialog.Builder(getContext());
+        reqBuilder
+                .content(R.string.requesting_ether)
+                .progress(true, 0);
+
+        reqDialog = reqBuilder.build();
+        reqDialog.show();
+
+        String URL = String.format(ROPSTEN_REQUEST_ETH, wallet.getAddress());
+        StringRequest postRequest = new StringRequest(Request.Method.GET, URL,
+                response -> {
+                    try {
+                        JSONObject parentObject = new JSONObject(response);
+                        Log.i("TOKEN", parentObject.toString());
+                        String address = parentObject.getString("address");
+                        String txHash = parentObject.getString("txHash");
+                        Integer amount = parentObject.getInt("amount");
+                        Snackbar.make(view, "Request Successful", Snackbar.LENGTH_LONG).show();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        Snackbar.make(view, "Cannot send request at the moment", Snackbar.LENGTH_LONG).show();
+                        Log.i("TOKEN", e.getMessage());
+                    }
+                    reqDialog.dismiss();
+                },
+                error -> {
+                    Snackbar.make(view, error.getMessage(), Snackbar.LENGTH_LONG).show();
+                    reqDialog.dismiss();
+                    Snackbar.make(view, "Cannot send request at the moment", Snackbar.LENGTH_LONG).show();
+                    Log.i("TOKEN", error.toString());
+                }
+        );
+        MainActivity.queue.add(postRequest);
     }
 
 }

@@ -123,13 +123,16 @@ public class SendFragment extends Fragment {
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 Log.i("SEND-INT", e.getMessage());
+                Snackbar.make(getView(), e.getMessage(), Snackbar.LENGTH_LONG).show();
             } catch (TransactionException e) {
                 Log.i("SEND-TRAN", e.getMessage());
+                Snackbar.make(getView(), e.getMessage(), Snackbar.LENGTH_LONG).show();
             } catch (IOException e) {
                 Log.i("SEND-IO", e.getMessage());
+                Snackbar.make(getView(), e.getMessage(), Snackbar.LENGTH_LONG).show();
             } catch (ExecutionException e) {
-                e.printStackTrace();
                 Log.i("SEND-EX", e.getMessage());
+                Snackbar.make(getView(), e.getMessage(), Snackbar.LENGTH_LONG).show();
             }
         });
 
@@ -212,13 +215,12 @@ public class SendFragment extends Fragment {
     private void sendEther(Wallet wallet, String toAccount, double amount) throws InterruptedException, TransactionException, IOException, ExecutionException {
         Web3j web3j = Web3jFactory.build(new HttpService(ROPSTEN_URL));
 
-//        Credentials credentials = Credentials.create(wallet.getKey(), wallet.getAddress());
         Credentials credentials = Credentials.create(wallet.getKey());
 
         TransactionReceipt transactionReceipt = Transfer.sendFunds(web3j,
                 credentials,
                 toAccount,
-                BigDecimal.ONE,
+                BigDecimal.valueOf(amount),
                 Convert.Unit.ETHER).sendAsync().get();
 
         System.out.println("Transaction Hash:"+transactionReceipt.getTransactionHash());
