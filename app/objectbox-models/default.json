@@ -1,0 +1,150 @@
+{
+  "_note1": "KEEP THIS FILE! Check it into a version control system (VCS) like git.",
+  "_note2": "ObjectBox manages crucial IDs for your object model. See docs for details.",
+  "_note3": "If you have VCS merge conflicts, you must resolve them according to ObjectBox docs.",
+  "entities": [
+    {
+      "id": "1:5317902351364022689",
+      "lastPropertyId": "4:853764696630948635",
+      "name": "Balance",
+      "properties": [
+        {
+          "id": "1:7400023032481730803",
+          "name": "id"
+        },
+        {
+          "id": "2:7039491432340253786",
+          "indexId": "1:3796639699463103045",
+          "name": "walletToken"
+        },
+        {
+          "id": "3:6520743734832674496",
+          "name": "balance"
+        },
+        {
+          "id": "4:853764696630948635",
+          "name": "token"
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "2:3933209221699124436",
+      "lastPropertyId": "6:5259106896997158316",
+      "name": "Token",
+      "properties": [
+        {
+          "id": "1:5063685518253446410",
+          "name": "id"
+        },
+        {
+          "id": "2:5451400901800902944",
+          "indexId": "2:7318641205476106617",
+          "name": "address"
+        },
+        {
+          "id": "3:7091182854607233476",
+          "name": "name"
+        },
+        {
+          "id": "4:3413359660140319308",
+          "name": "symbol"
+        },
+        {
+          "id": "5:8222844537865490",
+          "name": "decimal"
+        },
+        {
+          "id": "6:5259106896997158316",
+          "name": "channel"
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "3:2345540812286124092",
+      "lastPropertyId": "4:6270136160077026970",
+      "name": "Wallet",
+      "properties": [
+        {
+          "id": "1:1733404291428010519",
+          "name": "id"
+        },
+        {
+          "id": "2:3463749614417741654",
+          "indexId": "3:5530813163520400061",
+          "name": "address"
+        },
+        {
+          "id": "3:3282707245249601909",
+          "name": "key"
+        },
+        {
+          "id": "4:6270136160077026970",
+          "name": "name"
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "5:3072899460792753072",
+      "lastPropertyId": "7:1055576775613555113",
+      "name": "Tx",
+      "properties": [
+        {
+          "id": "1:3646281291541809508",
+          "name": "id"
+        },
+        {
+          "id": "2:5148807231740592718",
+          "indexId": "5:3057065571412852234",
+          "name": "txHash"
+        },
+        {
+          "id": "3:8153210319113110761",
+          "name": "fromWallet"
+        },
+        {
+          "id": "4:6846772426834024907",
+          "name": "toWallet"
+        },
+        {
+          "id": "5:863243555856789529",
+          "name": "token"
+        },
+        {
+          "id": "6:5941897109585190943",
+          "name": "value"
+        },
+        {
+          "id": "7:1055576775613555113",
+          "name": "status"
+        }
+      ],
+      "relations": []
+    }
+  ],
+  "lastEntityId": "5:3072899460792753072",
+  "lastIndexId": "5:3057065571412852234",
+  "lastRelationId": "0:0",
+  "lastSequenceId": "0:0",
+  "modelVersion": 4,
+  "modelVersionParserMinimum": 4,
+  "retiredEntityUids": [
+    3836909985831454253
+  ],
+  "retiredIndexUids": [
+    4059455735190530341
+  ],
+  "retiredPropertyUids": [
+    424859625857776387,
+    3974344330250258643,
+    1400518579178275040,
+    1147766542402353031,
+    8997953655975421600,
+    8159755577974471068,
+    5543826448012471009
+  ],
+  "retiredRelationUids": [],
+  "version": 1
+}
