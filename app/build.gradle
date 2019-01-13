@@ -44,6 +44,10 @@ dependencies {
 
     // rxjava
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
+    implementation 'com.android.support:appcompat-v7:27.0.0'
+    implementation 'com.google.zxing:core:3.2.1'
+    implementation 'com.manusunny:pinlock:1.1.0'
+
 }
 
 configurations.all {

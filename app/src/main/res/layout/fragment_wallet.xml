@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.crimson.crimson.WalletFragment">
+    tools:context="com.namadi.crimson.fragments.WalletFragment">
 
         <TextView
             android:id="@+id/no_wallet_message"

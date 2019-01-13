@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:stretchColumns="0,1"
+    android:padding="16dp"
+    android:id="@+id/single_wallet_layout"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+        <TableRow
+            android:layout_marginBottom="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_column="0"
+                android:id="@+id/wallet_name"/>
+
+            <Button
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_column="1"
+                android:id="@+id/change_name_btn"
+                android:text="Change Name" />
+        </TableRow>
+
+        <TableRow
+            android:layout_marginBottom="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_column="0"
+                android:text="Address" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_column="1"
+                android:id="@+id/wallet_address" />
+        </TableRow>
+
+        <TableRow
+            android:layout_marginBottom="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:text="Balance"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_column="0" />
+
+        </TableRow>
+
+        <TableRow
+            android:visibility="gone"
+            android:id="@+id/balance_1"
+            android:layout_marginBottom="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/balance_1_amount"
+                android:layout_column="0" />
+
+            <TextView
+                android:id="@+id/balance_1_symbol"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_column="1" />
+        </TableRow>
+
+        <TableRow
+            android:visibility="gone"
+            android:id="@+id/balance_2"
+            android:layout_marginBottom="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/balance_2_amount"
+                android:layout_column="0" />
+
+            <TextView
+                android:id="@+id/balance_2_symbol"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_column="1" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:text="SEND"
+                android:id="@+id/wallet_send_btn"
+                android:layout_column="0" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:text="RECEIVE"
+                android:id="@+id/wallet_receive_btn"
+                android:layout_column="1" />
+        </TableRow>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:text="Request Free Test ETH"
+        android:layout_gravity="center"
+        android:id="@+id/request_eth"
+        />
+
+
+    </TableLayout>

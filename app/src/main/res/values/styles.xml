@@ -6,6 +6,12 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:textViewStyle">@style/MyTextViewStyle</item>
+    </style>
+
+    <style name="MyTextViewStyle" parent="android:Widget.TextView">
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">16dp</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -17,4 +23,31 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <style name="PinLock" >
+        <item name="pinLength">4</item>
+        <item name="backgroundColor">#FFFFFF</item>
+
+        <item name="keypadButtonShape">@drawable/rectangle</item>
+        <item name="keypadTextColor">#000000</item>
+        <item name="keypadTextSize">9dp</item>
+        <item name="keypadWidth">250dp</item>
+        <item name="keypadHeight">280dp</item>
+        <item name="keypadVerticalSpacing">3dp</item>
+        <item name="keypadHorizontalSpacing">2dp</item>
+        <item name="keypadClickAnimationDuration">100</item>
+
+        <item name="cancelForgotTextColor">#000000</item>
+        <item name="cancelForgotTextSize">6dp</item>
+
+        <item name="infoTextColor">#000000</item>
+        <item name="infoTextSize">8dp</item>
+
+        <item name="vibrateOnClick">true</item>
+        <item name="vibrateDuration">20</item>
+
+        <item name="statusEmptyBackground">@drawable/dot_empty</item>
+        <item name="statusFilledBackground">@drawable/dot_filled</item>
+        <item name="statusDotDiameter">10dp</item>
+        <item name="statusDotSpacing">15dp</item>
+    </style>
 </resources>

@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.crimson.crimson">
+    package="com.namadi.crimson">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
         android:allowBackup="true"
@@ -13,7 +16,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
+            android:name="com.namadi.crimson.activities.MainActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -22,17 +25,30 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ScanToSendActivity"
+        <activity
+            android:name="com.namadi.crimson.activities.ScanToSendActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-
-        </activity>
-        <activity android:name=".ScanToWatchActivity"
+            android:theme="@style/AppTheme"></activity>
+        <activity
+            android:name="com.namadi.crimson.activities.ScanToWatchActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-
+            android:theme="@style/AppTheme"></activity>
+        <activity
+            android:name="com.namadi.crimson.activities.pin.ConfirmPinActivity"
+            android:theme="@style/AppTheme"
+            android:noHistory="true"></activity>
+        <activity
+            android:name="com.namadi.crimson.activities.pin.SetPinActivity"
+            android:theme="@style/AppTheme"
+            android:noHistory="true"></activity>
+        <activity
+            android:name="com.namadi.crimson.activities.WalletActivity"
+            android:label="@string/title_activity_wallet"
+            android:screenOrientation="portrait"
+            android:parentActivityName="com.namadi.crimson.activities.MainActivity"
+            android:theme="@style/AppTheme">
         </activity>
     </application>
 

@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.crimson.crimson.SettingsFragment">
+    tools:context="com.namadi.crimson.fragments.SettingsFragment">
 
     <RelativeLayout
         android:padding="10dp"
@@ -162,23 +162,20 @@
             <CheckBox
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:id="@+id/btc_currency"
+                android:text="NGN"/>
+
+            <CheckBox
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/usd_currency"
                 android:text="USD"/>
 
-
             <CheckBox
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="GBP"/>
-
-            <CheckBox
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:id="@+id/eur_currency"
                 android:text="EUR"/>
-
-            <CheckBox
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="NGN"/>
 
             <Button
                 android:id="@+id/add_more_currency"
