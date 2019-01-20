@@ -1,8 +1,11 @@
 package com.namadi.crimson.models;
 
+import java.util.Date;
+
 import io.objectbox.annotation.Entity;
 import io.objectbox.annotation.Id;
 import io.objectbox.annotation.Unique;
+import io.objectbox.relation.ToOne;
 
 @Entity
 public class Tx {
@@ -15,9 +18,11 @@ public class Tx {
 
     private String fromWallet;
     private String toWallet;
-    private Integer token;
-    private String value;
+    private String token;
+    private Double value;
     private String status;
+    private Integer blockNumber;
+    private Date createdAt;
 
     public long getId() {
         return id;
@@ -51,24 +56,40 @@ public class Tx {
         this.toWallet = toWallet;
     }
 
-    public Integer getToken() {
+    public Integer getBlockNumber() {
+        return blockNumber;
+    }
+
+    public void setBlockNumber(Integer blockNumber) {
+        this.blockNumber = blockNumber;
+    }
+
+    public String getToken() {
         return token;
     }
 
-    public void setToken(Integer token) {
+    public void setToken(String token) {
         this.token = token;
     }
 
-    public String getValue() {
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Double getValue() {
         return value;
     }
 
-    public void setValue(String value) {
+    public void setValue(Double value) {
         this.value = value;
     }
 
     public String getStatus() {
-        return status;
+        return status == null ? "FAILED" : status;
     }
 
     public void setStatus(String status) {

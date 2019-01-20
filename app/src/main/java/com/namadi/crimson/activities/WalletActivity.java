@@ -4,18 +4,28 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.media.MediaScannerConnection;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputEditText;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
+import android.widget.Spinner;
 import android.widget.TableRow;
 import android.widget.TextView;
 
@@ -35,12 +45,20 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import com.namadi.crimson.models.Balance;
 import com.namadi.crimson.models.Token;
+import com.namadi.crimson.models.Tx;
+import com.namadi.crimson.models.Tx_;
 import com.namadi.crimson.models.Wallet;
+import com.namadi.crimson.wallet.WalletLIstAdapter;
 
+import static com.namadi.crimson.activities.MainActivity.sharedPref;
+import static com.namadi.crimson.activities.MainActivity.syncBalance;
 import static com.namadi.crimson.utils.Constants.CURRENT_CHANNEL;
 import static com.namadi.crimson.utils.Constants.MAINNET_CHANNEL;
 import static com.namadi.crimson.utils.Constants.MAINNET_TOKEN_BALANCE;
@@ -52,23 +70,71 @@ import static com.namadi.crimson.utils.Constants.ROPSTEN_TOKEN_BALANCE;
 
 public class WalletActivity extends AppCompatActivity {
 
-    private MaterialDialog.Builder builder, reqBuilder;
-    private MaterialDialog reqDialog;
+    private MaterialDialog.Builder builder, qrCodeBuilder, reqBuilder;
+    private MaterialDialog reqDialog, qrDialog;
+
     private MaterialDialog changeNameDialog, receiveDialog;
     private TextView walletName, walletAddress;
     private Button changeName, send, share, requestEth;
     private Wallet wallet;
-    String currentChannel = MainActivity.sharedPref.getString(CURRENT_CHANNEL, null);
+    String currentChannel = MainActivity.currentChannel;
     View contextView, changeWalletName, shareDialog;
     private TextInputEditText walletNameInput;
 
     public final static int QRcodeWidth = 500 ;
     private static final String IMAGE_DIRECTORY = "/QRcodeDemonuts";
     Bitmap bitmap ;
-    private EditText etqr;
-    private ImageView iv;
-    private Button btn;
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.options, menu);
+
+        MenuItem item = menu.findItem(R.id.spinner);
+        Spinner spinner = (Spinner) MenuItemCompat.getActionView(item);
+
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.networks, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        spinner.setAdapter(adapter);
+        int pos = 0;
+        if(currentChannel == RINKEBY_CHANNEL) { pos = 1; }
+        else if (currentChannel == ROPSTEN_CHANNEL) { pos = 2; }
+
+        spinner.setSelection(pos, false);
+        spinner.post(() -> spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                String selectedChannel;
+                if (i == 1) {
+                    selectedChannel = RINKEBY_CHANNEL;
+                } else if (i == 2) {
+                    selectedChannel = ROPSTEN_CHANNEL;
+                } else {
+                    selectedChannel = ROPSTEN_CHANNEL;
+                }
+
+                if(currentChannel == selectedChannel) {
+                    return;
+                }
+
+                currentChannel = selectedChannel;
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putString(CURRENT_CHANNEL, selectedChannel);
+                editor.commit();
+
+                Snackbar.make(findViewById(R.id.single_wallet_layout), "network channel changed", Snackbar.LENGTH_SHORT).show();
+                updateBalance();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        }));
+
+        return true;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,46 +205,28 @@ public class WalletActivity extends AppCompatActivity {
         });
 
         share.setOnClickListener(view -> {
-            try {
-                bitmap = TextToImageEncode(address);
-                builder = new MaterialDialog.Builder(this);
-                builder
-                        .customView(R.layout.share_dialog, true)
-                        .negativeText("Close")
-                        .positiveText("Export QR Code")
-                        .onPositive((dialog, which) -> {
-                            String path = saveImage(bitmap);  //give read write permission
-                            Snackbar.make(contextView, "qr code saved " + path, Snackbar.LENGTH_LONG).show();
-                        })
-                        .onNegative((dialog, which) -> {
-                            receiveDialog.dismiss();
-                        })
-                        .onAny((dialog, which) -> {
-                        });
-
-                shareDialog  = builder.build().getCustomView();
-                TextView walletName = shareDialog.findViewById(R.id.wallet_name_view);
-                TextView walletAddressView = shareDialog.findViewById(R.id.wallet_address_view);
-                ImageView qrImageView = shareDialog.findViewById(R.id.iv);
-
-                walletName.setText(wallet.getName());
-                walletAddressView.setText(wallet.getAddress());
-                qrImageView.setImageBitmap(bitmap);
-
-                walletAddressView.setOnClickListener(v -> {
-                    ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                    ClipData clip = ClipData.newPlainText("address", wallet.getAddress());
-                    clipboard.setPrimaryClip(clip);
-                    Snackbar.make(contextView, "address copied", Snackbar.LENGTH_LONG).show();
-                });
-
-                receiveDialog = builder.build();
-                receiveDialog.show();
-
-            } catch (WriterException e) {
-                e.printStackTrace();
-            }
+            new GenerateGR().execute();
         });
+
+
+        TextView txLabel = findViewById(R.id.transactions_list_label);
+
+        ArrayList<String> tx_list = new ArrayList<>();
+        for(Tx tx : MainActivity.txBox.query().equal(Tx_.fromWallet, wallet.getAddress()).build().find()) {
+            String wallet = tx.getToWallet().substring(0,5) + "..." + tx.getToWallet().substring(tx.getToWallet().length() - 5);
+            tx_list.add("To: " + wallet + "\tValue: " + tx.getValue() + "\tStatus: " + tx.getStatus());
+        }
+
+        ArrayAdapter<String> lIstAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, tx_list);
+
+        if(tx_list.size() > 0) {
+            txLabel.setText("transactions");
+        } else {
+            txLabel.setText("no transactions");
+        }
+
+        ListView txListAdapter = findViewById(R.id.tx_list);
+        txListAdapter.setAdapter(lIstAdapter);
     }
 
     private void displayBalanceUi() {
@@ -204,6 +252,9 @@ public class WalletActivity extends AppCompatActivity {
 
     private void updateBalance() {
         for(Token token : MainActivity.tokenBox.getAll()) {
+            if(!token.getChannel().equals(currentChannel)) {
+                continue;
+            }
             String URL = null;
 
             switch (currentChannel) {
@@ -219,7 +270,6 @@ public class WalletActivity extends AppCompatActivity {
             }
 
             URL = String.format(URL, token.getAddress(), wallet.getAddress());
-
             StringRequest postRequest = new StringRequest(Request.Method.GET, URL,
                     response -> {
                         try {
@@ -237,17 +287,17 @@ public class WalletActivity extends AppCompatActivity {
 
                             row.addView(amount);
                             row.addView(tv);
-                            Log.i("BALANCE", name + "---" + amount);
+                            Log.d("BALANCE", name + "---" + amount);
 
                         } catch (JSONException e) {
                             e.printStackTrace();
-                            Snackbar.make(contextView, "Cannot retrieve com.namadi.crimson.wallet balance", Snackbar.LENGTH_LONG).show();
-                            Log.i("TOKEN", e.getMessage());
+                            Snackbar.make(contextView, "Cannot retrieve wallet balance", Snackbar.LENGTH_LONG).show();
+                            Log.d("BALANCE", e.getMessage());
                         }
                     },
                     error -> {
-                        Snackbar.make(contextView, "Cannot retrieve com.namadi.crimson.wallet balance", Snackbar.LENGTH_LONG).show();
-                        Log.i("TOKEN", error.toString());
+                        Snackbar.make(contextView, "Cannot retrieve wallet balance", Snackbar.LENGTH_LONG).show();
+                        Log.d("BALANCE", error.toString());
                     }
             );
             MainActivity.queue.add(postRequest);
@@ -268,22 +318,23 @@ public class WalletActivity extends AppCompatActivity {
                 response -> {
                     try {
                         JSONObject parentObject = new JSONObject(response);
-                        Log.i("TOKEN", parentObject.toString());
+                        Log.d("REQUEST-TOKEN", parentObject.toString());
                         String address = parentObject.getString("address");
                         String txHash = parentObject.getString("txHash");
                         Integer amount = parentObject.getInt("amount");
+                        reqDialog.dismiss();
                         Snackbar.make(contextView, "Request Successful", Snackbar.LENGTH_LONG).show();
                     } catch (JSONException e) {
                         e.printStackTrace();
+                        reqDialog.dismiss();
                         Snackbar.make(contextView, "Cannot send request at the moment", Snackbar.LENGTH_LONG).show();
-                        Log.i("TOKEN", e.getMessage());
+                        Log.d("REQUEST-TOKEN", "JSONException: " + e.getMessage());
                     }
-                    reqDialog.dismiss();
                 },
                 error -> {
-                    Snackbar.make(contextView, error.getMessage(), Snackbar.LENGTH_LONG).show();
                     reqDialog.dismiss();
-                    Log.i("TOKEN", error.toString());
+                    Snackbar.make(contextView, "Error Sending Request, Try again later", Snackbar.LENGTH_LONG).show();
+                    Log.d("REQUEST-TOKEN", "Error: " +  error.toString());
                 }
         );
         MainActivity.queue.add(postRequest);
@@ -336,7 +387,7 @@ public class WalletActivity extends AppCompatActivity {
         // have the object build the directory structure, if needed.
 
         if (!wallpaperDirectory.exists()) {
-            Log.d("dirrrrrr", "" + wallpaperDirectory.mkdirs());
+            Log.d("DIRR", "" + wallpaperDirectory.mkdirs());
             wallpaperDirectory.mkdirs();
         }
 
@@ -350,14 +401,105 @@ public class WalletActivity extends AppCompatActivity {
                     new String[]{f.getPath()},
                     new String[]{"image/jpeg"}, null);
             fo.close();
-            Log.d("TAG", "File Saved::--->" + f.getAbsolutePath());
+            Log.d("DIRR", "File Saved::--->" + f.getAbsolutePath());
 
             return f.getAbsolutePath();
         } catch (IOException e1) {
+            Log.d("DIRR", "exception: "+e1.getMessage());
             e1.printStackTrace();
         }
         return "";
 
+    }
+
+    private String saveBitmap(Bitmap bitmap){
+        String path = Environment.getExternalStorageDirectory() + IMAGE_DIRECTORY;
+        if(bitmap!=null){
+            try {
+                FileOutputStream outputStream = null;
+                try {
+                    outputStream = new FileOutputStream(path);
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        if (outputStream != null) {
+                            outputStream.close();
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        return path;
+    }
+
+    private class GenerateGR extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                bitmap = TextToImageEncode(wallet.getAddress());
+            } catch (WriterException e) {
+                e.printStackTrace();
+            }
+            return "Executed";
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            builder = new MaterialDialog.Builder(WalletActivity.this);
+            builder
+                    .customView(R.layout.share_dialog, true)
+                    .negativeText("Close")
+                    .positiveText("Export QR Code")
+                    .onPositive((dialog, which) -> {
+                        String path = saveBitmap(bitmap);  //give read write permission
+                        Snackbar.make(contextView, "qr code saved at " + path, Snackbar.LENGTH_LONG).show();
+                    })
+                    .onNegative((dialog, which) -> {
+                        receiveDialog.dismiss();
+                    })
+                    .onAny((dialog, which) -> {
+                    });
+
+            shareDialog  = builder.build().getCustomView();
+            TextView walletName = shareDialog.findViewById(R.id.wallet_name_view);
+            TextView walletAddressView = shareDialog.findViewById(R.id.wallet_address_view);
+            ImageView qrImageView = shareDialog.findViewById(R.id.iv);
+
+            walletName.setText(wallet.getName());
+            walletAddressView.setText(wallet.getAddress());
+            qrImageView.setImageBitmap(bitmap);
+
+            walletAddressView.setOnClickListener(v -> {
+                ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                ClipData clip = ClipData.newPlainText("address", wallet.getAddress());
+                clipboard.setPrimaryClip(clip);
+                Snackbar.make(contextView, "address copied", Snackbar.LENGTH_LONG).show();
+            });
+
+            receiveDialog = builder.build();
+            qrDialog.dismiss();
+            receiveDialog.show();
+        }
+
+        @Override
+        protected void onPreExecute() {
+            qrCodeBuilder = new MaterialDialog.Builder(WalletActivity.this);
+            qrCodeBuilder
+                    .content(R.string.generating_qr_code)
+                    .progress(true, 0);
+            qrDialog = qrCodeBuilder.build();
+            qrDialog.show();
+        }
+
+        @Override
+        protected void onProgressUpdate(Void... values) {}
     }
 
 }

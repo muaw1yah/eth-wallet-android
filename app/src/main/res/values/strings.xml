@@ -26,7 +26,16 @@
         <item>GBP</item>
         <item>CND</item>
     </string-array>
+
+    <string-array name="networks">
+        <item>Mainnet</item>
+        <item>Rinkby</item>
+        <item>Ropsten</item>
+    </string-array>
+
+
     <string name="title_activity_scan_to_send">ScanToSendActivity</string>
     <string name="title_activity_wallet">Wallet</string>
+    <string name="network">Network</string>
 
 </resources>

@@ -22,4 +22,12 @@ public class Constants {
     public static final String ROPSTEN_TOKEN_BALANCE = "https://test.tokenbalance.com/token/%s/%s";
     public static final String RINKEBY_TOKEN_BALANCE = "https://rinkeby.tokenbalance.com/token/%s/%s";
     public static final String ROPSTEN_REQUEST_ETH = "https://faucet.ropsten.be/donate/%S";
+
+    public static final String getChannelURL(String key) {
+        switch (key) {
+            case ROPSTEN_CHANNEL: return ROPSTEN_URL;
+            case RINKEBY_CHANNEL: return RINKEBY_URL;
+            default: return MAINNET_URL;
+        }
+    }
 }

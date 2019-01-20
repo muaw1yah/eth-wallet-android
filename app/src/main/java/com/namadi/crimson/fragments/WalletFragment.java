@@ -22,6 +22,8 @@ import com.namadi.crimson.models.Token;
 import com.namadi.crimson.models.Wallet;
 import com.namadi.crimson.wallet.WalletLIstAdapter;
 
+import static com.namadi.crimson.utils.Constants.MAINNET_CHANNEL;
+
 
 /**
  */
@@ -85,6 +87,7 @@ public class WalletFragment extends Fragment {
         }
         builder
                 .content(R.string.creating_wallet_loading)
+                .cancelable(false)
                 .progress(true, 0);
 
         dialog = builder.build();
@@ -101,8 +104,10 @@ public class WalletFragment extends Fragment {
             if(mTextMessage.getVisibility() == View.VISIBLE) {
                 Token token = new Token();
                 token.setDecimal(18);
-                token.setName("Ether");
-                token.setSymbol("ETH");
+                token.setName("Binance");
+                token.setAddress("0xB8c77482e45F1F44dE1745F52C74426C631bDD52");
+                token.setSymbol("BNB");
+                token.setChannel(MAINNET_CHANNEL);
                 MainActivity.tokenBox.put(token);
                 mTextMessage.setVisibility(View.GONE);
             }

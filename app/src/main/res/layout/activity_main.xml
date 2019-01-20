@@ -6,6 +6,7 @@
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    tools:menu="@menu/options"
     tools:context="com.namadi.crimson.activities.MainActivity">
 
     <FrameLayout
@@ -23,5 +24,7 @@
         android:layout_alignParentBottom="true"
         android:background="?android:attr/windowBackground"
         app:menu="@menu/navigation" />
+
+
 
 </RelativeLayout>

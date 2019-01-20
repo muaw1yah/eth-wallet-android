@@ -1,5 +1,6 @@
 package com.namadi.crimson.activities;
 
+import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -8,17 +9,27 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.app.FragmentTransaction;
 import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.Snackbar;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import android.app.Fragment;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.kenai.jffi.Main;
 import com.manusunny.pinlock.PinListener;
 import com.namadi.crimson.activities.pin.ConfirmPinActivity;
 import com.namadi.crimson.activities.pin.SetPinActivity;
@@ -67,13 +78,15 @@ public class MainActivity extends AppCompatActivity  {
 
     private MaterialDialog.Builder builder;
     private MaterialDialog dialog;
+    public static String currentChannel;
+    private Fragment selectedFragment = null;
+    public static Spinner spinner;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            Fragment selectedFragment = null;
             if(current == item.getItemId()) {
                 return false;
             }
@@ -140,6 +153,62 @@ public class MainActivity extends AppCompatActivity  {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.options, menu);
+
+        MenuItem item = menu.findItem(R.id.spinner);
+        spinner = (Spinner) MenuItemCompat.getActionView(item);
+
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.networks, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        spinner.setAdapter(adapter);
+        int pos = 0;
+        if(currentChannel == RINKEBY_CHANNEL) { pos = 1; }
+        else if (currentChannel == ROPSTEN_CHANNEL) { pos = 2; }
+
+        spinner.setSelection(pos, false);
+        spinner.post(() -> spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                String selectedChannel;
+                if (i == 1) {
+                    selectedChannel = RINKEBY_CHANNEL;
+                } else if (i == 2) {
+                    selectedChannel = ROPSTEN_CHANNEL;
+                } else {
+                    selectedChannel = ROPSTEN_CHANNEL;
+                }
+
+                if(currentChannel == selectedChannel) {
+                    return;
+                }
+
+                currentChannel = selectedChannel;
+                editor.putString(CURRENT_CHANNEL, selectedChannel);
+                editor.commit();
+
+                Snackbar.make(findViewById(R.id.container), "network channel changed", Snackbar.LENGTH_SHORT).show();
+                syncBalance();
+
+                Fragment fragment = selectedFragment;
+                FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                transaction.detach(fragment);
+                transaction.attach(fragment);
+                transaction.commit();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        }));
+
+        return true;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -185,6 +254,7 @@ public class MainActivity extends AppCompatActivity  {
             transaction.commit();
         }
 
+        currentChannel = sharedPref.getString(CURRENT_CHANNEL, MAINNET_CHANNEL);
         syncBalance();
     }
 
@@ -208,15 +278,20 @@ public class MainActivity extends AppCompatActivity  {
     }
 
     public static void updateBalance(Wallet wallet) {
-        HashMap<String, String> channels = new HashMap<>();
-        channels.put(MAINNET_CHANNEL, MAINNET_URL);
-        channels.put(ROPSTEN_CHANNEL, ROPSTEN_URL);
-        channels.put(RINKEBY_CHANNEL, RINKEBY_URL);
+        String URL;
+        if(currentChannel == ROPSTEN_CHANNEL) {
+            URL = ROPSTEN_URL;
+        } else if (currentChannel == RINKEBY_CHANNEL) {
+            URL = RINKEBY_URL;
+        } else {
+            URL = MAINNET_URL;
+        }
 
-        for(String key : channels.keySet()) {
-            String URL = channels.get(key);
+        Log.d("BALANCE-SET", "URL: " + URL);
+        Log.d("BALANCE-SET", "CHANNEL: " + currentChannel);
+
             StringRequest request = new StringRequest(Request.Method.POST, URL, response -> {
-                Log.i("BALANCE", wallet.getAddress());
+                Log.d("BALANCE-WALLET", wallet.getAddress());
 
                 try {
                     JSONObject obj = new JSONObject(response);
@@ -225,7 +300,7 @@ public class MainActivity extends AppCompatActivity  {
                     Double balance = Double.valueOf(wei) / Double.valueOf(WEI2ETH);
 
                     Query<Balance> query = MainActivity.balanceBox.query()
-                            .equal(Balance_.walletToken, wallet.getAddress() + "-" + key).build();
+                            .equal(Balance_.walletToken, wallet.getAddress() + "-" + currentChannel).build();
 
                     Balance balanceObj = query.findUnique();
 
@@ -235,18 +310,18 @@ public class MainActivity extends AppCompatActivity  {
                         balanceObj.setToken("ETH");
                     } else {
                         balanceObj = new Balance();
-                        balanceObj.setWalletToken(wallet.getAddress() + "-" + key);
+                        balanceObj.setWalletToken(wallet.getAddress() + "-" + currentChannel);
                         balanceObj.setBalance(balance);
                         balanceObj.setToken("ETH");
                     }
 
-                    Log.i("BALANCE SET", wallet.getAddress() + " >>>> " + balance);
+                    Log.d("BALANCE-SET", wallet.getAddress() + " >>>> " + balance);
 
                     MainActivity.balanceBox.put(balanceObj);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-            }, error -> Log.i("BALANCE", error.toString())) {
+            }, error -> Log.i("BALANCE-ERROR", error.toString())) {
                 @Override
                 public byte[] getBody() {
                     JSONObject obj = new JSONObject();
@@ -282,5 +357,4 @@ public class MainActivity extends AppCompatActivity  {
 
             MainActivity.queue.add(request);
         }
-    }
 }

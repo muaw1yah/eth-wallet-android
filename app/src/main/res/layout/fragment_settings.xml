@@ -2,6 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:tag="WALLET_FRAGMENT"
     tools:context="com.namadi.crimson.fragments.SettingsFragment">
 
     <RelativeLayout
@@ -184,6 +185,15 @@
                 android:textColor="@color/colorAccent"
                 android:layout_height="wrap_content"
                 android:text="+ Currency"/>
+
+            <Button
+                android:layout_marginTop="10dp"
+                android:id="@+id/change_pin"
+                android:layout_width="wrap_content"
+                android:textSize="8sp"
+                android:textColor="@color/colorAccent"
+                android:layout_height="wrap_content"
+                android:text="Change Pin"/>
 
             <TextView
                 android:layout_width="match_parent"
