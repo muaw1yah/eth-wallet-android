@@ -129,5 +129,19 @@
         android:id="@+id/request_eth"
         />
 
+    <TextView
+        android:id="@+id/transactions_list_label"
+        android:layout_marginTop="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:textAlignment="center"
+        android:text="Transactions"
+        android:layout_column="1" />
+
+    <ListView
+        android:id="@+id/tx_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"></ListView>
 
     </TableLayout>

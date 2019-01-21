@@ -16,6 +16,8 @@ public class Balance {
 
     private String token;
 
+    private String channel;
+
     public long getId() {
         return id;
     }
@@ -46,6 +48,15 @@ public class Balance {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+
+    public String getChannel() {
+        return channel;
+    }
+
+    public void setChannel(String channel) {
+        this.channel = channel;
     }
 
     public Balance() {}
