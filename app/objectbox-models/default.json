@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "1:5317902351364022689",
-      "lastPropertyId": "4:853764696630948635",
+      "lastPropertyId": "5:561317332553308062",
       "name": "Balance",
       "properties": [
         {
@@ -24,6 +24,10 @@
         {
           "id": "4:853764696630948635",
           "name": "token"
+        },
+        {
+          "id": "5:561317332553308062",
+          "name": "channel"
         }
       ],
       "relations": []

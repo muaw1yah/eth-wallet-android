@@ -42,29 +42,37 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.stream.Stream;
 
 import io.objectbox.Box;
 import io.objectbox.BoxStore;
 import io.objectbox.query.Query;
+import io.objectbox.query.QueryBuilder;
+
 import com.namadi.crimson.models.Balance;
 import com.namadi.crimson.models.Balance_;
 import com.namadi.crimson.models.MyObjectBox;
 import com.namadi.crimson.models.Token;
+import com.namadi.crimson.models.Token_;
 import com.namadi.crimson.models.Tx;
 import com.namadi.crimson.models.Wallet;
 
 import static com.namadi.crimson.utils.Constants.CURRENT_CHANNEL;
 import static com.namadi.crimson.utils.Constants.MAINNET_CHANNEL;
+import static com.namadi.crimson.utils.Constants.MAINNET_TOKEN_BALANCE;
 import static com.namadi.crimson.utils.Constants.MAINNET_URL;
 import static com.namadi.crimson.utils.Constants.RINKEBY_CHANNEL;
+import static com.namadi.crimson.utils.Constants.RINKEBY_TOKEN_BALANCE;
 import static com.namadi.crimson.utils.Constants.RINKEBY_URL;
 import static com.namadi.crimson.utils.Constants.ROPSTEN_CHANNEL;
+import static com.namadi.crimson.utils.Constants.ROPSTEN_TOKEN_BALANCE;
 import static com.namadi.crimson.utils.Constants.ROPSTEN_URL;
 import static com.namadi.crimson.utils.Constants.WEI2ETH;
 
-public class MainActivity extends AppCompatActivity  {
+public class MainActivity extends AppCompatActivity {
     private int current;
     public static BoxStore boxStore;
     public static Box<Wallet> walletBox;
@@ -87,7 +95,7 @@ public class MainActivity extends AppCompatActivity  {
 
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            if(current == item.getItemId()) {
+            if (current == item.getItemId()) {
                 return false;
             }
             current = item.getItemId();
@@ -112,11 +120,11 @@ public class MainActivity extends AppCompatActivity  {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode == PinListener.CANCELLED) {
+        if (resultCode == PinListener.CANCELLED) {
             finish();
         }
 
-        if(resultCode == PinListener.FORGOT) {
+        if (resultCode == PinListener.FORGOT) {
             builder = new MaterialDialog.Builder(this);
             builder
                     .title("Wipe App Data?")
@@ -164,24 +172,17 @@ public class MainActivity extends AppCompatActivity  {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         spinner.setAdapter(adapter);
-        int pos = 0;
-        if(currentChannel == RINKEBY_CHANNEL) { pos = 1; }
-        else if (currentChannel == ROPSTEN_CHANNEL) { pos = 2; }
-
-        spinner.setSelection(pos, false);
         spinner.post(() -> spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                String selectedChannel;
+                String selectedChannel = MAINNET_CHANNEL;
                 if (i == 1) {
                     selectedChannel = RINKEBY_CHANNEL;
                 } else if (i == 2) {
                     selectedChannel = ROPSTEN_CHANNEL;
-                } else {
-                    selectedChannel = ROPSTEN_CHANNEL;
                 }
 
-                if(currentChannel == selectedChannel) {
+                if (currentChannel == selectedChannel) {
                     return;
                 }
 
@@ -189,7 +190,7 @@ public class MainActivity extends AppCompatActivity  {
                 editor.putString(CURRENT_CHANNEL, selectedChannel);
                 editor.commit();
 
-                Snackbar.make(findViewById(R.id.container), "network channel changed", Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(findViewById(R.id.container), "Network Switched", Snackbar.LENGTH_SHORT).show();
                 syncBalance();
 
                 Fragment fragment = selectedFragment;
@@ -204,6 +205,12 @@ public class MainActivity extends AppCompatActivity  {
 
             }
         }));
+
+        if (currentChannel == RINKEBY_CHANNEL) {
+            spinner.setSelection(1);
+        } else if (currentChannel == ROPSTEN_CHANNEL) {
+            spinner.setSelection(2);
+        }
 
         return true;
     }
@@ -222,7 +229,7 @@ public class MainActivity extends AppCompatActivity  {
         editor = sharedPref.edit();
 
         String pin = sharedPref.getString("SET-PIN", null);
-        if(pin == null) {
+        if (pin == null) {
             Intent intent = new Intent(this, SetPinActivity.class);
             startActivityForResult(intent, 1);
         } else {
@@ -230,25 +237,25 @@ public class MainActivity extends AppCompatActivity  {
             startActivityForResult(intent, 1);
         }
 
-        if(sharedPref.getString(CURRENT_CHANNEL, null) == null) {
+        if (sharedPref.getString(CURRENT_CHANNEL, null) == null) {
             editor.putString(CURRENT_CHANNEL, MAINNET_CHANNEL);
             editor.apply();
         }
 
-        if(boxStore == null) {
+        if (boxStore == null) {
             boxStore = MyObjectBox.builder()
                     .androidContext(MainActivity.this).build();
         }
 
-        if(queue == null) queue = Volley.newRequestQueue(MainActivity.this);
-        if(walletBox == null) walletBox = MainActivity.boxStore.boxFor(Wallet.class);
-        if(tokenBox == null) tokenBox = MainActivity.boxStore.boxFor(Token.class);
-        if(balanceBox == null) balanceBox = MainActivity.boxStore.boxFor(Balance.class);
-        if(txBox == null) txBox = MainActivity.boxStore.boxFor(Tx.class);
+        if (queue == null) queue = Volley.newRequestQueue(MainActivity.this);
+        if (walletBox == null) walletBox = MainActivity.boxStore.boxFor(Wallet.class);
+        if (tokenBox == null) tokenBox = MainActivity.boxStore.boxFor(Token.class);
+        if (balanceBox == null) balanceBox = MainActivity.boxStore.boxFor(Balance.class);
+        if (txBox == null) txBox = MainActivity.boxStore.boxFor(Tx.class);
 
         Intent intent = getIntent();
         String navigate = intent.getStringExtra("NAVIGATE");
-        if(navigate != null && navigate.equals("SEND")) {
+        if (navigate != null && navigate.equals("SEND")) {
             FragmentTransaction transaction = getFragmentManager().beginTransaction();
             transaction.replace(R.id.frame_layout, SendFragment.newInstance());
             transaction.commit();
@@ -258,103 +265,138 @@ public class MainActivity extends AppCompatActivity  {
         syncBalance();
     }
 
-//    private class CheckBalance extends AsyncTask<Void, Void, Void> {
-//
-//        @Override
-//        protected Void doInBackground(Void... voids) {
-//            try {
-//                CrimsonWallet.connectEthereum();
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//            return null;
-//        }
-//    }
-
     public static void syncBalance() {
-        for(Wallet wallet : walletBox.getAll()) {
+        for (Wallet wallet : walletBox.getAll()) {
             updateBalance(wallet);
+            updateTokenBalance(wallet);
+        }
+    }
+
+    public static void updateTokenBalance(Wallet wallet) {
+        QueryBuilder<Token> builder = MainActivity.tokenBox.query();
+        builder.equal(Token_.channel, currentChannel);
+        List<Token> tokens = builder.build().find();
+
+        for (Token t : tokens) {
+            if (!t.getChannel().equals(currentChannel)) {
+                continue;
+            }
+            String URL = MAINNET_TOKEN_BALANCE;
+            if (currentChannel == ROPSTEN_CHANNEL) {
+                URL = ROPSTEN_TOKEN_BALANCE;
+            } else if (currentChannel == RINKEBY_CHANNEL) {
+                URL = RINKEBY_TOKEN_BALANCE;
+            }
+
+            URL = String.format(URL, t.getAddress(), wallet.getAddress());
+
+            StringRequest postRequest = new StringRequest(Request.Method.GET, URL,
+                    response -> {
+                        try {
+                            JSONObject parentObject = new JSONObject(response);
+                            Double balance = parentObject.getDouble("balance");
+
+                            Query<Balance> query = MainActivity.balanceBox.query()
+                                    .equal(Balance_.walletToken, wallet.getAddress() + "-" + t.getSymbol() + "-" + currentChannel).build();
+
+                            Balance balanceObj = query.findUnique();
+
+                            if (balanceObj != null) {
+                                balanceObj.setBalance(balance);
+                                balanceObj.setToken(t.getSymbol());
+                                balanceObj.setChannel(currentChannel);
+                            } else {
+                                balanceObj = new Balance();
+                                balanceObj.setWalletToken(wallet.getAddress() + "-" + t.getSymbol() + "-" + currentChannel);
+                                balanceObj.setBalance(balance);
+                                balanceObj.setToken(t.getSymbol());
+                                balanceObj.setChannel(currentChannel);
+                            }
+
+                            MainActivity.balanceBox.put(balanceObj);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            Log.i("TOKEN", e.getMessage());
+                        }
+                    },
+                    error -> {
+                        Log.i("TOKEN", error.toString());
+                    }
+            );
+            MainActivity.queue.add(postRequest);
         }
     }
 
     public static void updateBalance(Wallet wallet) {
-        String URL;
-        if(currentChannel == ROPSTEN_CHANNEL) {
+        String URL = MAINNET_URL;
+        if (currentChannel == ROPSTEN_CHANNEL) {
             URL = ROPSTEN_URL;
         } else if (currentChannel == RINKEBY_CHANNEL) {
             URL = RINKEBY_URL;
-        } else {
-            URL = MAINNET_URL;
         }
 
-        Log.d("BALANCE-SET", "URL: " + URL);
-        Log.d("BALANCE-SET", "CHANNEL: " + currentChannel);
+        StringRequest request = new StringRequest(Request.Method.POST, URL, response -> {
 
-            StringRequest request = new StringRequest(Request.Method.POST, URL, response -> {
-                Log.d("BALANCE-WALLET", wallet.getAddress());
+            try {
+                JSONObject obj = new JSONObject(response);
+                String result = obj.getString("result");
+                Long wei = Long.parseLong(result.substring(2), 16);
+                Double balance = Double.valueOf(wei) / Double.valueOf(WEI2ETH);
+
+                Query<Balance> query = MainActivity.balanceBox.query()
+                        .equal(Balance_.walletToken, wallet.getAddress() + "-" + currentChannel).build();
+
+                Balance balanceObj = query.findUnique();
+
+                if (balanceObj != null) {
+                    balanceObj.setBalance(balance);
+                    balanceObj.setToken("ETH");
+                    balanceObj.setChannel(currentChannel);
+                } else {
+                    balanceObj = new Balance();
+                    balanceObj.setWalletToken(wallet.getAddress() + "-" + currentChannel);
+                    balanceObj.setBalance(balance);
+                    balanceObj.setToken("ETH");
+                    balanceObj.setChannel(currentChannel);
+                }
+
+                MainActivity.balanceBox.put(balanceObj);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }, error -> Log.i("BALANCE-ERROR", error.toString())) {
+            @Override
+            public byte[] getBody() {
+                JSONObject obj = new JSONObject();
+
+                JSONArray data = new JSONArray();
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    Stream.of(new String[]{wallet.getAddress(), "latest"})
+                            .forEach(data::put);
+                } else {
+                    data.put(wallet.getAddress());
+                    data.put("latest");
+                }
 
                 try {
-                    JSONObject obj = new JSONObject(response);
-                    String result = obj.getString("result");
-                    Long wei = Long.parseLong(result.substring(2), 16);
-                    Double balance = Double.valueOf(wei) / Double.valueOf(WEI2ETH);
-
-                    Query<Balance> query = MainActivity.balanceBox.query()
-                            .equal(Balance_.walletToken, wallet.getAddress() + "-" + currentChannel).build();
-
-                    Balance balanceObj = query.findUnique();
-
-
-                    if(balanceObj != null) {
-                        balanceObj.setBalance(balance);
-                        balanceObj.setToken("ETH");
-                    } else {
-                        balanceObj = new Balance();
-                        balanceObj.setWalletToken(wallet.getAddress() + "-" + currentChannel);
-                        balanceObj.setBalance(balance);
-                        balanceObj.setToken("ETH");
-                    }
-
-                    Log.d("BALANCE-SET", wallet.getAddress() + " >>>> " + balance);
-
-                    MainActivity.balanceBox.put(balanceObj);
+                    obj.put("params", data);
+                    obj.put("jsonrpc", "2.0");
+                    obj.put("method", "eth_getBalance");
+                    obj.put("id", "1");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-            }, error -> Log.i("BALANCE-ERROR", error.toString())) {
-                @Override
-                public byte[] getBody() {
-                    JSONObject obj = new JSONObject();
 
-                    JSONArray data = new JSONArray();
+                return obj.toString().getBytes();
+            }
 
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        Stream.of(new String[]{wallet.getAddress(), "latest"})
-                                .forEach(data::put);
-                    } else {
-                        data.put(wallet.getAddress());
-                        data.put("latest");
-                    }
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+            }
+        };
 
-                    try {
-                        obj.put("params", data);
-                        obj.put("jsonrpc","2.0");
-                        obj.put("method","eth_getBalance");
-                        obj.put("id", "1");
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-
-
-                    return obj.toString().getBytes();
-                }
-
-                @Override
-                public String getBodyContentType() {
-                    return "application/json";
-                }
-            };
-
-            MainActivity.queue.add(request);
-        }
+        MainActivity.queue.add(request);
+    }
 }

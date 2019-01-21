@@ -9,7 +9,7 @@
     <string name="sending_transaction">Sending</string>
 
     <string name="adding_token_loading">Loading Token Information</string>
-    <string name="requesting_ether">Sending Request</string>
+    <string name="requesting_ether">Requesting Free Ether</string>
     <string name="generating_qr_code">Generating QR Code</string>
 
 
@@ -29,13 +29,32 @@
 
     <string-array name="networks">
         <item>Mainnet</item>
-        <item>Rinkby</item>
-        <item>Ropsten</item>
+        <item>Rinkby (Test)</item>
+        <item>Ropsten (Test)</item>
     </string-array>
 
 
     <string name="title_activity_scan_to_send">ScanToSendActivity</string>
     <string name="title_activity_wallet">Wallet</string>
     <string name="network">Network</string>
+    <string name="title_activity_about">AboutActivity</string>
+    <string name="about_msg">
+        Designed by Mu\'awiyah Namadi, Note that this app does not transmit or store any data,
+        all wallets generated are stored on the user\'s device. Feel free to use or copy this app in anyway you wish,
+        check out the source code using the github icon bellow, pull requests are welcome
+    </string>
+
+    <string-array name="app_features">
+        <item>- Pin authentication</item>
+        <item>- Creation of new wallet</item>
+        <item>- Generate QR Code from wallet address</item>
+        <item>- Request free ether on Ropsten net</item>
+        <item>- Send Ether / any other token</item>
+        <item>- Scan QR Code to send</item>
+        <item>- Switch between Mainnet, Rinkby (Test) and Ropsten (Test) Networks</item>
+        <item>- Currency Conversion</item>
+        <item>- Change Pin</item>
+        <item>- View Wallet Transactions</item>
+    </string-array>
 
 </resources>

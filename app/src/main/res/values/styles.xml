@@ -23,7 +23,7 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
-    <style name="PinLock" >
+    <style name="PinLock">
         <item name="pinLength">4</item>
         <item name="backgroundColor">#FFFFFF</item>
 

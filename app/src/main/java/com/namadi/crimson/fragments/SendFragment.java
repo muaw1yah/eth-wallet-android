@@ -49,6 +49,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutionException;
 
+import com.namadi.crimson.activities.WalletActivity;
 import com.namadi.crimson.models.Token;
 import com.namadi.crimson.models.Tx;
 import com.namadi.crimson.models.Wallet;
@@ -147,7 +148,7 @@ public class SendFragment extends Fragment {
             timer.schedule(new TimerTask(){
                 public void run() {
                     try {
-                        if(selectedToken.getName().equals("Ether")) {
+                        if(selectedToken == null) {
                             TransactionReceipt receipt = sendEther(toSendFrom, addressToSend, amountToSend);
                             tx.setTxHash(receipt.getTransactionHash());
                             tx.setStatus(receipt.getStatus());
@@ -158,6 +159,12 @@ public class SendFragment extends Fragment {
                             tx.setStatus("PENDING");
                             tx.setToken(selectedToken.getName());
                         }
+
+                        Snackbar.make(getView(),"Sent: Transaction Pending", Snackbar.LENGTH_LONG).show();
+                        Intent intent = new Intent(getActivity(), WalletActivity.class);
+                        intent.putExtra("WalletID", selectedWallet.getId());
+                        getActivity().startActivity(intent);
+
                     } catch (InterruptedException e) {
                         dialog.dismiss();
                         e.printStackTrace();
@@ -227,10 +234,10 @@ public class SendFragment extends Fragment {
         int i = 1;
         ArrayList tokenItems = new ArrayList<String>();
         HashMap<String, Token> tokenMap = new HashMap<>();
-        tokenItems.add("Send Token To Send");
+        tokenItems.add("Select Token To Send");
+        tokenItems.add("Ether");
 
         for(Token t: tokens) {
-            Log.i("SEND", t.getName());
             tokenItems.add(t.getName());
             tokenMap.put(t.getName() + index, t);
             i++;
@@ -242,10 +249,7 @@ public class SendFragment extends Fragment {
         tokenSpinner.setAdapter(tokenAdapter);
 
         tokenSpinner.setOnItemSelectedListener((MaterialSpinner.OnItemSelectedListener<String>) (view, position, id, item) -> {
-            if(tokens.size() == 1) {
-                sendLayout.setVisibility(View.VISIBLE);
-                selectedToken = tokens.get(0);
-            } else if(position != 0) {
+            if(position != 0) {
                 sendLayout.setVisibility(View.VISIBLE);
                 selectedToken = tokenMap.get(item + position);
             } else {

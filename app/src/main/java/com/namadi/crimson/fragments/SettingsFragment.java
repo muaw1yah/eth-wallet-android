@@ -25,6 +25,7 @@ import android.widget.TextView;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.android.volley.Request;
 import com.android.volley.toolbox.StringRequest;
+import com.namadi.crimson.activities.AboutActivity;
 import com.namadi.crimson.activities.MainActivity;
 import com.namadi.crimson.activities.ScanToWatchActivity;
 import com.namadi.crimson.R;
@@ -36,6 +37,7 @@ import java.util.List;
 
 import io.objectbox.query.QueryBuilder;
 
+import com.namadi.crimson.activities.WalletActivity;
 import com.namadi.crimson.activities.pin.SetPinActivity;
 import com.namadi.crimson.models.Token;
 import com.namadi.crimson.models.Token_;
@@ -191,8 +193,17 @@ public class SettingsFragment extends Fragment {
                 })
                 .show());
 
+        myFragmentView.findViewById(R.id.about_label).setOnClickListener(view -> {
+            Intent intent = new Intent(getActivity(), AboutActivity.class);
+            getActivity().startActivity(intent);
+        });
+
         watchTokenBtn = myFragmentView.findViewById(R.id.add_token);
         watchTokenBtn.setOnClickListener(view -> {
+            if(MainActivity.tokenBox.getAll().size() > 4) {
+                Snackbar.make(getView(), "Can't add more than 5 tokens", Snackbar.LENGTH_LONG).show();
+                return;
+            }
             builder = new MaterialDialog.Builder(getActivity());
             builder
                     .title("Add Token")

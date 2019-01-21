@@ -60,7 +60,6 @@ public class WalletFragment extends Fragment {
         addWalletBtn = myFragmentView.findViewById(R.id.fab);
 
         wallet_list = new ArrayList<>(MainActivity.walletBox.getAll());
-        //wallet_list = helper.getAllWallets();
         walletAdapter = new WalletLIstAdapter(getActivity(), R.layout.single_wallet, wallet_list);
 
         if(wallet_list.size() > 0) {
@@ -72,11 +71,8 @@ public class WalletFragment extends Fragment {
         }
 
         ListView walletListAdapter = myFragmentView.findViewById(R.id.wallet_list);
-
         walletListAdapter.setAdapter(walletAdapter);
-
         addWalletBtn.setOnClickListener(view -> createNewWallet());
-
         return myFragmentView;
     }
 
@@ -100,7 +96,6 @@ public class WalletFragment extends Fragment {
             wallet.setName(name);
             wallet = MainActivity.walletBox.get(MainActivity.walletBox.put(wallet));
 
-            Log.i("ID", "Wallet Id: " + wallet.getId());
             if(mTextMessage.getVisibility() == View.VISIBLE) {
                 Token token = new Token();
                 token.setDecimal(18);
@@ -113,10 +108,10 @@ public class WalletFragment extends Fragment {
             }
             wallet_list.add(wallet);
             walletAdapter.notifyDataSetChanged();
-            Snackbar.make(getView(), "New wallet has been added ", Snackbar.LENGTH_LONG).show();
+            Snackbar.make(getView(), "New Wallet Added", Snackbar.LENGTH_LONG).show();
         } catch (Exception e) {
             e.printStackTrace();
-            Log.i("CREATE WALLET", e.getMessage());
+            Snackbar.make(getView(), "Cannot add wallet at the moment", Snackbar.LENGTH_LONG).show();
         } finally {
             dialog.dismiss();
         }
@@ -124,39 +119,6 @@ public class WalletFragment extends Fragment {
         if(wallet != null) {
             MainActivity.updateBalance(wallet);
         }
-
-//        StringRequest postRequest = new StringRequest(Request.Method.POST, GENERATE_WALLET,
-//                response -> {
-//                    try {
-//                        JSONObject parentObject = new JSONObject(response);
-//                        String address = parentObject.getString("publicAddress");
-//                        String key = parentObject.getString("privateKey");
-//                        String name = "Wallet " + (wallet_list.size() + 1);
-//                        Wallet com.namadi.crimson.wallet = new Wallet();
-//                        com.namadi.crimson.wallet.setName(name);
-//                        com.namadi.crimson.wallet.setAddress(address);
-//                        com.namadi.crimson.wallet.setKey(key);
-//                        com.namadi.crimson.wallet = MainActivity.walletBox.get(MainActivity.walletBox.put(com.namadi.crimson.wallet));
-//
-//                        Log.i("ID", "Wallet Id: " + com.namadi.crimson.wallet.getId());
-//                        if(mTextMessage.getVisibility() == View.VISIBLE) {
-//                            mTextMessage.setVisibility(View.GONE);
-//                        }
-//                        wallet_list.add(com.namadi.crimson.wallet);
-//                        walletAdapter.notifyDataSetChanged();
-//                        Snackbar.make(getView(), "New com.namadi.crimson.wallet has been added ", Snackbar.LENGTH_LONG).show();
-//                    } catch (JSONException e) {
-//                        e.printStackTrace();
-//                        Snackbar.make(getView(), "Cannot add com.namadi.crimson.wallet", Snackbar.LENGTH_LONG).show();
-//                    }
-//                    dialog.dismiss();
-//                },
-//                error -> {
-//                    Snackbar.make(getView(), "Cannot add com.namadi.crimson.wallet", Snackbar.LENGTH_LONG).show();
-//                    dialog.dismiss();
-//                }
-//        );
-        //MainActivity.queue.add(postRequest);
     }
 
 

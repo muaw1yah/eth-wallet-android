@@ -7,7 +7,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.media.MediaScannerConnection;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.design.widget.Snackbar;
@@ -38,6 +40,7 @@ import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.namadi.crimson.R;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -49,24 +52,32 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.stream.Stream;
 
 import com.namadi.crimson.models.Balance;
+import com.namadi.crimson.models.Balance_;
 import com.namadi.crimson.models.Token;
 import com.namadi.crimson.models.Tx;
 import com.namadi.crimson.models.Tx_;
 import com.namadi.crimson.models.Wallet;
 import com.namadi.crimson.wallet.WalletLIstAdapter;
 
+import io.objectbox.query.Query;
+
 import static com.namadi.crimson.activities.MainActivity.sharedPref;
 import static com.namadi.crimson.activities.MainActivity.syncBalance;
 import static com.namadi.crimson.utils.Constants.CURRENT_CHANNEL;
 import static com.namadi.crimson.utils.Constants.MAINNET_CHANNEL;
 import static com.namadi.crimson.utils.Constants.MAINNET_TOKEN_BALANCE;
+import static com.namadi.crimson.utils.Constants.MAINNET_URL;
 import static com.namadi.crimson.utils.Constants.RINKEBY_CHANNEL;
 import static com.namadi.crimson.utils.Constants.RINKEBY_TOKEN_BALANCE;
+import static com.namadi.crimson.utils.Constants.RINKEBY_URL;
 import static com.namadi.crimson.utils.Constants.ROPSTEN_CHANNEL;
 import static com.namadi.crimson.utils.Constants.ROPSTEN_REQUEST_ETH;
 import static com.namadi.crimson.utils.Constants.ROPSTEN_TOKEN_BALANCE;
+import static com.namadi.crimson.utils.Constants.ROPSTEN_URL;
+import static com.namadi.crimson.utils.Constants.WEI2ETH;
 
 public class WalletActivity extends AppCompatActivity {
 
@@ -97,20 +108,13 @@ public class WalletActivity extends AppCompatActivity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         spinner.setAdapter(adapter);
-        int pos = 0;
-        if(currentChannel == RINKEBY_CHANNEL) { pos = 1; }
-        else if (currentChannel == ROPSTEN_CHANNEL) { pos = 2; }
-
-        spinner.setSelection(pos, false);
         spinner.post(() -> spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                String selectedChannel;
+                String selectedChannel = MAINNET_CHANNEL;
                 if (i == 1) {
                     selectedChannel = RINKEBY_CHANNEL;
                 } else if (i == 2) {
-                    selectedChannel = ROPSTEN_CHANNEL;
-                } else {
                     selectedChannel = ROPSTEN_CHANNEL;
                 }
 
@@ -132,6 +136,10 @@ public class WalletActivity extends AppCompatActivity {
 
             }
         }));
+
+        if(currentChannel == RINKEBY_CHANNEL) {spinner.setSelection(1); }
+        else if (currentChannel == ROPSTEN_CHANNEL) { spinner.setSelection(2); }
+        else { spinner.setSelection(0); }
 
         return true;
     }
@@ -161,7 +169,11 @@ public class WalletActivity extends AppCompatActivity {
         updateBalance();
 
         requestEth.setOnClickListener(view -> {
-            requestFreeEth(wallet);
+            if(currentChannel != ROPSTEN_CHANNEL) {
+                Snackbar.make(contextView, "Switch to Ropsten net first", Snackbar.LENGTH_LONG).show();
+            } else {
+                requestFreeEth(wallet);
+            }
         });
 
         changeName.setOnClickListener(view -> {
@@ -212,9 +224,16 @@ public class WalletActivity extends AppCompatActivity {
         TextView txLabel = findViewById(R.id.transactions_list_label);
 
         ArrayList<String> tx_list = new ArrayList<>();
+        ArrayList<Tx> txs = new ArrayList<>();
+
         for(Tx tx : MainActivity.txBox.query().equal(Tx_.fromWallet, wallet.getAddress()).build().find()) {
+            txs.add(tx);
             String wallet = tx.getToWallet().substring(0,5) + "..." + tx.getToWallet().substring(tx.getToWallet().length() - 5);
-            tx_list.add("To: " + wallet + "\tValue: " + tx.getValue() + "\tStatus: " + tx.getStatus());
+            if(tx.getStatus().equals("FAILED")) {
+                tx_list.add("To: " + wallet + "\tValue: " + tx.getValue() + "\tStatus: " + tx.getStatus());
+            } else {
+                tx_list.add("To: " + wallet + "\tValue: " + tx.getValue() + "\tView Transaction");
+            }
         }
 
         ArrayAdapter<String> lIstAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, tx_list);
@@ -227,32 +246,85 @@ public class WalletActivity extends AppCompatActivity {
 
         ListView txListAdapter = findViewById(R.id.tx_list);
         txListAdapter.setAdapter(lIstAdapter);
+        txListAdapter.setOnItemClickListener((adapterView, view, i, l) -> {
+            String item = tx_list.get(i);
+            Tx tx = txs.get(i);
+            if(item.contains("View Transaction")) {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://ropsten.etherscan.io/tx/" + tx.getTxHash()));
+                startActivity(browserIntent);
+
+            }
+        });
     }
 
     private void displayBalanceUi() {
-        int count = 1;
-        for(Balance b : MainActivity.balanceBox.getAll()) {
-            if(b.getWalletToken().contains(wallet.getAddress())) {
-                TableRow currentRow = findViewById(getId("balance_" + count));
-                if(currentRow == null) { continue; }
+        String URL = MAINNET_URL;
+        if (currentChannel == ROPSTEN_CHANNEL) {
+            URL = ROPSTEN_URL;
+        } else if (currentChannel == RINKEBY_CHANNEL) {
+            URL = RINKEBY_URL;
+        }
+
+        StringRequest request = new StringRequest(Request.Method.POST, URL, response -> {
+
+            try {
+                JSONObject obj = new JSONObject(response);
+                String result = obj.getString("result");
+                Long wei = Long.parseLong(result.substring(2), 16);
+                Double balance = Double.valueOf(wei) / Double.valueOf(WEI2ETH);
+
+                TableRow currentRow = findViewById(getId("balance_1"));
+                if(currentRow == null) { return; }
                 currentRow.setVisibility(View.VISIBLE);
 
+                TextView amount = findViewById(getId("balance_1_amount"));
+                amount.setText(balance.toString());
 
-                TextView amount = findViewById(getId("balance_" + count + "_amount"));
-                amount.setText(b.getBalance().toString());
-
-                TextView token = findViewById(getId("balance_" + count + "_symbol"));
-                token.setText(b.getToken());
-
-                Log.i("BALANCE", b.getBalance() + " " + b.getToken());
+                TextView tv = findViewById(getId("balance_1_symbol"));
+                tv.setText("ETH");
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
-            count++;
-        }
+        }, error -> Log.i("BALANCE-ERROR", error.toString())) {
+            @Override
+            public byte[] getBody() {
+                JSONObject obj = new JSONObject();
+
+                JSONArray data = new JSONArray();
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    Stream.of(new String[]{wallet.getAddress(), "latest"})
+                            .forEach(data::put);
+                } else {
+                    data.put(wallet.getAddress());
+                    data.put("latest");
+                }
+
+                try {
+                    obj.put("params", data);
+                    obj.put("jsonrpc", "2.0");
+                    obj.put("method", "eth_getBalance");
+                    obj.put("id", "1");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                return obj.toString().getBytes();
+            }
+
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+            }
+        };
+
+        MainActivity.queue.add(request);
     }
 
     private void updateBalance() {
+        int count = 2;
         for(Token token : MainActivity.tokenBox.getAll()) {
-            if(!token.getChannel().equals(currentChannel)) {
+            if(token.getChannel() == null || !token.getChannel().equals(currentChannel)) {
                 continue;
             }
             String URL = null;
@@ -269,38 +341,45 @@ public class WalletActivity extends AppCompatActivity {
                     break;
             }
 
+            Log.d("TOKEN-BALANCE", "TOKEN: " + token.getSymbol());
+            Log.d("TOKEN-BALANCE", "URL: " + URL);
+            Log.d("TOKEN-BALANCE", "CHANNEL: " + currentChannel);
+
             URL = String.format(URL, token.getAddress(), wallet.getAddress());
+            int finalCount = count;
             StringRequest postRequest = new StringRequest(Request.Method.GET, URL,
                     response -> {
                         try {
                             JSONObject parentObject = new JSONObject(response);
                             String name = parentObject.getString("name");
                             String symbol = parentObject.getString("symbol");
-                            Integer decimals = parentObject.getInt("decimals");
                             Double balance = parentObject.getDouble("balance");
 
-                            TableRow row = new TableRow(this);
-                            TextView amount = new TextView(this);
-                            TextView tv = new TextView(this);
+                            TableRow currentRow = findViewById(getId("balance_" + finalCount));
+                            if(currentRow == null) { return; }
+                            currentRow.setVisibility(View.VISIBLE);
+
+                            TextView amount = findViewById(getId("balance_" + finalCount + "_amount"));
                             amount.setText(balance.toString());
+
+                            TextView tv = findViewById(getId("balance_" + finalCount + "_symbol"));
                             tv.setText(symbol);
 
-                            row.addView(amount);
-                            row.addView(tv);
-                            Log.d("BALANCE", name + "---" + amount);
+                            Log.d("TOKEN-BALANCE", name + "---" + amount);
 
                         } catch (JSONException e) {
                             e.printStackTrace();
                             Snackbar.make(contextView, "Cannot retrieve wallet balance", Snackbar.LENGTH_LONG).show();
-                            Log.d("BALANCE", e.getMessage());
+                            Log.d("TOKEN-BALANCE", e.getMessage());
                         }
                     },
                     error -> {
                         Snackbar.make(contextView, "Cannot retrieve wallet balance", Snackbar.LENGTH_LONG).show();
-                        Log.d("BALANCE", error.toString());
+                        Log.d("TOKEN-BALANCE", error.toString());
                     }
             );
             MainActivity.queue.add(postRequest);
+            count++;
         }
     }
 
@@ -323,11 +402,11 @@ public class WalletActivity extends AppCompatActivity {
                         String txHash = parentObject.getString("txHash");
                         Integer amount = parentObject.getInt("amount");
                         reqDialog.dismiss();
-                        Snackbar.make(contextView, "Request Successful", Snackbar.LENGTH_LONG).show();
+                        Snackbar.make(contextView, "Request Sent", Snackbar.LENGTH_LONG).show();
                     } catch (JSONException e) {
                         e.printStackTrace();
                         reqDialog.dismiss();
-                        Snackbar.make(contextView, "Cannot send request at the moment", Snackbar.LENGTH_LONG).show();
+                        Snackbar.make(contextView, "Request Sent", Snackbar.LENGTH_LONG).show();
                         Log.d("REQUEST-TOKEN", "JSONException: " + e.getMessage());
                     }
                 },
