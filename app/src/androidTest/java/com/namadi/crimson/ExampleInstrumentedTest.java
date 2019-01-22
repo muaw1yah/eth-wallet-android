@@ -1,4 +1,4 @@
-package com.namadi.crimson.crimson;
+package com.namadi.crimson;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

@@ -1,4 +1,4 @@
-package com.namadi.crimson.crimson;
+package com.namadi.crimson;
 
 import org.junit.Test;
 

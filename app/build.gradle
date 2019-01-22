@@ -4,7 +4,7 @@ apply plugin: 'io.objectbox'
 android {
     compileSdkVersion 'android-P'
     defaultConfig {
-        applicationId "com.example.crimson.crimson"
+        applicationId "com.namadi.crimson"
         minSdkVersion 18
         targetSdkVersion 27
         versionCode 1
@@ -23,7 +23,6 @@ android {
         sourceCompatibility 1.8
     }
 }
-
 
 dependencies {
     implementation 'com.afollestad.material-dialogs:commons:0.9.6.0'
