@@ -1,0 +1,52 @@
+version: 2
+references:
+  # ----------------------------
+  # Cache Configuration
+  # ----------------------------
+  cache_key: &cache_key
+    key: cache-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}-{{ checksum "build.gradle" }}-{{ checksum "app/build.gradle" }}
+  restore_cache: &restore_cache
+    restore_cache:
+      <<: *cache_key
+  save_cache: &save_cache
+    save_cache:
+      <<: *cache_key
+      paths:
+        - ~/.gradle
+        - ~/.m2
+# ----------------------------
+# Docker Configuration
+# ----------------------------
+android_config: &android_config
+  working_directory: ~/your-project-root
+  docker:
+    - image: circleci/android:api-27-alpha
+  environment:
+    TERM: dumb
+    ANDROID_SDK_VERSION: 27
+    ANDROID_BUILD_TOOLS_VERSION: 27.0.2
+    GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2560M -XX:+HeapDumpOnOutOfMemoryError"'
+# ----------------------------
+# Job Section
+# ----------------------------
+jobs:
+  # Job Debug
+  build_debug:
+    ...
+  # Job Release
+  build_release:
+    ...
+  # Unit Tests
+  unit_test:
+    ...
+# ----------------------------
+# Workflows
+# ----------------------------
+workflows:
+  version: 2
+  debug_build_deploy:
+    jobs:
+      - build_debug:
+  release_build_deploy:
+    jobs:
+      - build_release:
