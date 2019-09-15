@@ -1,6 +1,5 @@
 package com.namadi.crimson.activities;
 
-import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,10 +10,8 @@ import android.app.FragmentTransaction;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import android.app.Fragment;
@@ -29,11 +26,10 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.kenai.jffi.Main;
-import com.manusunny.pinlock.PinListener;
-import com.namadi.crimson.activities.pin.ConfirmPinActivity;
-import com.namadi.crimson.activities.pin.SetPinActivity;
+import com.github.orangegangsters.lollipin.lib.PinActivity;
+import com.github.orangegangsters.lollipin.lib.managers.LockManager;
 import com.namadi.crimson.R;
+import com.namadi.crimson.activities.pin.CustomPinActivity;
 import com.namadi.crimson.fragments.SendFragment;
 import com.namadi.crimson.fragments.SettingsFragment;
 import com.namadi.crimson.fragments.WalletFragment;
@@ -42,8 +38,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -72,7 +66,7 @@ import static com.namadi.crimson.utils.Constants.ROPSTEN_TOKEN_BALANCE;
 import static com.namadi.crimson.utils.Constants.ROPSTEN_URL;
 import static com.namadi.crimson.utils.Constants.WEI2ETH;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends PinActivity {
     private int current;
     public static BoxStore boxStore;
     public static Box<Wallet> walletBox;
@@ -117,48 +111,48 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == PinListener.CANCELLED) {
-            finish();
-        }
-
-        if (resultCode == PinListener.FORGOT) {
-            builder = new MaterialDialog.Builder(this);
-            builder
-                    .title("Wipe App Data?")
-                    .content("Are you sure you want to delete all app data, which includes (Wallet(s), Token(s), Tx(s)?")
-                    .negativeText("No")
-                    .positiveText("Yes")
-                    .cancelable(false)
-                    .onPositive((dialog, which) -> {
-                        sharedPref
-                                .edit()
-                                .clear()
-                                .apply();
-                        walletBox.removeAll();
-                        tokenBox.removeAll();
-                        balanceBox.removeAll();
-                        dialog.dismiss();
-                        finish();
-                    })
-                    .onNegative((dialog, which) -> {
-                        dialog.dismiss();
-                        finish();
-                        startActivity(getIntent());
-                    })
-                    .onAny((dialog, which) -> {
-                        dialog.dismiss();
-                        finish();
-                        startActivity(getIntent());
-                    });
-
-
-            dialog = builder.build();
-            dialog.show();
-        }
-    }
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//        if (resultCode == PinListener.CANCELLED) {
+//            finish();
+//        }
+//
+//        if (resultCode == PinListener.FORGOT) {
+//            builder = new MaterialDialog.Builder(this);
+//            builder
+//                    .title("Wipe App Data?")
+//                    .content("Are you sure you want to delete all app data, which includes (Wallet(s), Token(s), Tx(s)?")
+//                    .negativeText("No")
+//                    .positiveText("Yes")
+//                    .cancelable(false)
+//                    .onPositive((dialog, which) -> {
+//                        sharedPref
+//                                .edit()
+//                                .clear()
+//                                .apply();
+//                        walletBox.removeAll();
+//                        tokenBox.removeAll();
+//                        balanceBox.removeAll();
+//                        dialog.dismiss();
+//                        finish();
+//                    })
+//                    .onNegative((dialog, which) -> {
+//                        dialog.dismiss();
+//                        finish();
+//                        startActivity(getIntent());
+//                    })
+//                    .onAny((dialog, which) -> {
+//                        dialog.dismiss();
+//                        finish();
+//                        startActivity(getIntent());
+//                    });
+//
+//
+//            dialog = builder.build();
+//            dialog.show();
+//        }
+//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -228,14 +222,17 @@ public class MainActivity extends AppCompatActivity {
         sharedPref = getPreferences(Context.MODE_PRIVATE);
         editor = sharedPref.edit();
 
-        String pin = sharedPref.getString("SET-PIN", null);
-        if (pin == null) {
-            Intent intent = new Intent(this, SetPinActivity.class);
-            startActivityForResult(intent, 1);
-        } else {
-            Intent intent = new Intent(this, ConfirmPinActivity.class);
-            startActivityForResult(intent, 1);
-        }
+        LockManager<CustomPinActivity> lockManager = LockManager.getInstance();
+        lockManager.enableAppLock(this, CustomPinActivity.class);
+
+//        String pin = sharedPref.getString("SET-PIN", null);
+//        if (pin == null) {
+//            Intent intent = new Intent(this, CustomPinActivity.class);
+//            startActivityForResult(intent, 1);
+//        } else {
+//            Intent intent = new Intent(this, ConfirmPinActivity.class);
+//            startActivityForResult(intent, 1);
+//        }
 
         if (sharedPref.getString(CURRENT_CHANNEL, null) == null) {
             editor.putString(CURRENT_CHANNEL, MAINNET_CHANNEL);
