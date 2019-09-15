@@ -3,9 +3,9 @@ package com.namadi.crimson.fragments;
 import android.app.Activity;
 import android.os.Bundle;
 import android.app.Fragment;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.util.Log;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

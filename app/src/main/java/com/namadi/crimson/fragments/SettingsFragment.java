@@ -2,13 +2,12 @@ package com.namadi.crimson.fragments;
 
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.app.Fragment;
-import android.support.design.widget.Snackbar;
-import android.support.design.widget.TextInputEditText;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.textfield.TextInputEditText;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -25,6 +24,7 @@ import android.widget.TextView;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.android.volley.Request;
 import com.android.volley.toolbox.StringRequest;
+import com.github.orangegangsters.lollipin.lib.managers.AppLock;
 import com.namadi.crimson.activities.AboutActivity;
 import com.namadi.crimson.activities.MainActivity;
 import com.namadi.crimson.activities.ScanToWatchActivity;
@@ -37,8 +37,7 @@ import java.util.List;
 
 import io.objectbox.query.QueryBuilder;
 
-import com.namadi.crimson.activities.WalletActivity;
-import com.namadi.crimson.activities.pin.SetPinActivity;
+import com.namadi.crimson.activities.pin.CustomPinActivity;
 import com.namadi.crimson.models.Token;
 import com.namadi.crimson.models.Token_;
 import com.namadi.crimson.models.Wallet;
@@ -46,6 +45,7 @@ import com.namadi.crimson.models.Wallet;
 import static com.namadi.crimson.utils.Constants.CURRENT_CHANNEL;
 import static com.namadi.crimson.utils.Constants.MAINNET_CHANNEL;
 import static com.namadi.crimson.utils.Constants.MAINNET_TOKEN_BALANCE;
+import static com.namadi.crimson.utils.Constants.REQUEST_CODE_ENABLE;
 import static com.namadi.crimson.utils.Constants.RINKEBY_CHANNEL;
 import static com.namadi.crimson.utils.Constants.RINKEBY_TOKEN_BALANCE;
 import static com.namadi.crimson.utils.Constants.ROPSTEN_CHANNEL;
@@ -139,8 +139,9 @@ public class SettingsFragment extends Fragment {
 
 
         myFragmentView.findViewById(R.id.change_pin).setOnClickListener(view -> {
-            Intent intent = new Intent(getActivity(), SetPinActivity.class);
-            startActivityForResult(intent, 1);
+            Intent intent = new Intent(getActivity(), CustomPinActivity.class);
+            intent.putExtra(AppLock.EXTRA_TYPE, AppLock.ENABLE_PINLOCK);
+            startActivityForResult(intent, REQUEST_CODE_ENABLE);
         });
 
         selectChannelBtn.setOnCheckedChangeListener((radioGroup, checkedId) -> {

@@ -29,6 +29,10 @@ allprojects {
         maven {
             url "https://maven.google.com"
         }
+        maven {
+            url "https://github.com/omadahealth/omada-nexus/raw/master/release"
+        }
+
     }
 }
 

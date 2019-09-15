@@ -12,10 +12,6 @@
     <string name="requesting_ether">Requesting Free Ether</string>
     <string name="generating_qr_code">Generating QR Code</string>
 
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-
     <string-array name="currencies">
         <item>CHZ</item>
         <item>INR</item>
@@ -56,5 +52,6 @@
         <item>- Change Pin</item>
         <item>- View Wallet Transactions</item>
     </string-array>
+    <string name="title_activity_custom_pin">Change Pin</string>
 
 </resources>
