@@ -29,16 +29,16 @@ android_config: &android_config
 # ----------------------------
 # Job Section
 # ----------------------------
-jobs:
-  # Job Debug
-  build_debug:
-    ...
-  # Job Release
-  build_release:
-    ...
-  # Unit Tests
-  unit_test:
-    ...
+#jobs:
+#  # Job Debug
+#  build_debug:
+#    ...
+#  # Job Release
+#  build_release:
+#    ...
+#  # Unit Tests
+#  unit_test:
+#    ...
 # ----------------------------
 # Workflows
 # ----------------------------
