@@ -9,6 +9,8 @@ import androidx.annotation.NonNull;
 import android.app.FragmentTransaction;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.snackbar.Snackbar;
+
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.MenuItemCompat;
 import android.util.Log;
 import android.view.Menu;
@@ -21,12 +23,10 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
-import com.afollestad.materialdialogs.MaterialDialog;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.github.orangegangsters.lollipin.lib.PinActivity;
 import com.github.orangegangsters.lollipin.lib.managers.LockManager;
 import com.namadi.crimson.R;
 import com.namadi.crimson.activities.pin.CustomPinActivity;
@@ -66,7 +66,7 @@ import static com.namadi.crimson.utils.Constants.ROPSTEN_TOKEN_BALANCE;
 import static com.namadi.crimson.utils.Constants.ROPSTEN_URL;
 import static com.namadi.crimson.utils.Constants.WEI2ETH;
 
-public class MainActivity extends PinActivity {
+public class MainActivity extends AppCompatActivity {
     private int current;
     public static BoxStore boxStore;
     public static Box<Wallet> walletBox;

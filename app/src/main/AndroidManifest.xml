@@ -19,7 +19,7 @@
         <activity
             android:name=".activities.pin.CustomPinActivity"
             android:label="@string/title_activity_custom_pin"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".activities.MainActivity"
             android:label="@string/app_name"

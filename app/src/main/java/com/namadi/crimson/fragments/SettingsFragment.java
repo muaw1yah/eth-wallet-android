@@ -138,11 +138,11 @@ public class SettingsFragment extends Fragment {
         loadTokens();
 
 
-        myFragmentView.findViewById(R.id.change_pin).setOnClickListener(view -> {
-            Intent intent = new Intent(getActivity(), CustomPinActivity.class);
-            intent.putExtra(AppLock.EXTRA_TYPE, AppLock.ENABLE_PINLOCK);
-            startActivityForResult(intent, REQUEST_CODE_ENABLE);
-        });
+//        myFragmentView.findViewById(R.id.change_pin).setOnClickListener(view -> {
+//            Intent intent = new Intent(getActivity(), CustomPinActivity.class);
+//            intent.putExtra(AppLock.EXTRA_TYPE, AppLock.ENABLE_PINLOCK);
+//            startActivityForResult(intent, REQUEST_CODE_ENABLE);
+//        });
 
         selectChannelBtn.setOnCheckedChangeListener((radioGroup, checkedId) -> {
             Log.d("CHECKED", "id: " + checkedId);

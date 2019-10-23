@@ -191,14 +191,14 @@
                 android:layout_height="wrap_content"
                 android:text="+ Currency"/>
 
-            <Button
-                android:layout_marginTop="10dp"
-                android:id="@+id/change_pin"
-                android:layout_width="wrap_content"
-                android:textSize="8sp"
-                android:textColor="@color/colorAccent"
-                android:layout_height="wrap_content"
-                android:text="Change Pin"/>
+<!--            <Button-->
+<!--                android:layout_marginTop="10dp"-->
+<!--                android:id="@+id/change_pin"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:textSize="8sp"-->
+<!--                android:textColor="@color/colorAccent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="Change Pin"/>-->
 
             <Button
                 android:layout_marginTop="10dp"
